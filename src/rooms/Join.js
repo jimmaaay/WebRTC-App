@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import {
   initiateRTC,
-  addDataChannel,
   changeHostOffer,
   nextStep,
   changePeerOffer,
@@ -21,17 +20,6 @@ class Join extends Component {
   componentDidMount() {
     this.props.initiateRTC(JOINING);
   }
-
-  componentWillReceiveProps(nextProps) {
-    const { computer } = nextProps.connection;
-    if (this.props.connection.computer === false && computer instanceof RTCPeerConnection) {
-      computer.ondatachannel = (e) => {
-        const channel = e.channel || e;
-        this.props.addDataChannel(channel);
-      };
-    }
-  }
-
 
   hostOfferChange({target}) {
     this.props.changeHostOffer(target.value);
@@ -94,7 +82,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     initiateRTC: _ => dispatch(initiateRTC(_)),
-    addDataChannel: _ => dispatch(addDataChannel(_)),
     changeHostOffer: _ => dispatch(changeHostOffer(_)),
     nextStep: _ => dispatch(nextStep()),
     changePeerOffer: _ => dispatch(changePeerOffer(_)),

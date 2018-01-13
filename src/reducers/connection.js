@@ -18,33 +18,14 @@ const defaultState = {
   step: 0, // 0 or 1
 };
 
-const addEventListeners = (dataChannel) => {
-  dataChannel.onopen = () => {
-    console.log('opened data channel');
-  };
-
-  dataChannel.onmessage = (e) => {
-    console.log(e);
-  };
-
-  dataChannel.onclose = (e) => {
-    console.log(e);
-  };
-
-  dataChannel.onerror = (e) => {
-    console.log(e);
-  };
-};
-
 const connection = (state = defaultState, action) => {
 
   switch (action.type) {
 
     case CONNECTION_INITIATE_RTC:
-      return { ...state, computer: new RTCPeerConnection(config, webConnection), stage: action.stage };
+      return { ...state, computer: action.computer, stage: action.stage };
 
     case CONNECTION_ADD_DATA_CHANNEL:
-      addEventListeners(action.dataChannel);
       return { ...state, dataChannel: action.dataChannel };
 
     case CONNECTION_CHANGE_HOST_OFFER:
@@ -63,7 +44,4 @@ const connection = (state = defaultState, action) => {
 
 }
 
-export default (store) => {
-  console.log(store);
-  return connection;
-}
+export default connection;

@@ -3,8 +3,6 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import {
   initiateRTC,
-  addDataChannel,
-  changeHostOffer,
   nextStep,
   changePeerOffer,
 } from '../actions/connection';
@@ -22,29 +20,6 @@ class Create extends Component {
 
   componentDidMount() {
     this.props.initiateRTC(CREATING);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { computer } = this.props.connection;
-    if (computer === false && nextProps.connection.computer instanceof RTCPeerConnection) {
-      const { computer } = nextProps.connection;
-      const dataChannel = computer.createDataChannel('webrtc', {
-        reliable: true,
-      });
-
-      computer.onicecandidate = (e) => {
-        if (e.candidate != null) return;
-        this.props.changeHostOffer(btoa(JSON.stringify(computer.localDescription)));
-      }
-
-      computer
-        .createOffer()
-        .then(_ => computer.setLocalDescription(_))
-        .catch(errorHandler);
-
-      this.props.addDataChannel(dataChannel);
-    }
-
   }
 
   peerResponseChange({target}) {
@@ -103,8 +78,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     initiateRTC: _ => dispatch(initiateRTC(_)),
-    addDataChannel: _ => dispatch(addDataChannel(_)),
-    changeHostOffer: _ => dispatch(changeHostOffer(_)),
     nextStep: _ => dispatch(nextStep()),
     changePeerOffer: _ => dispatch(changePeerOffer(_)),
   };

@@ -5,10 +5,15 @@ import {
   CONNECTION_NEXT_STEP,
   CONNECTION_CHANGE_PEER_OFFER,
   CONNECTION_JOINED,
+  CREATING,
+  JOINING,
 } from '../constants';
 
-export const initiateRTC = (stage) => {
+import { config, connection as webConnection, errorHandler } from '../rooms/webrtc';
+
+const generateRTC = (computer, stage) => {
   return {
+    computer,
     stage,
     type: CONNECTION_INITIATE_RTC,
   };
@@ -44,5 +49,40 @@ export const nextStep = () => {
 export const joined = () => {
   return {
     type: CONNECTION_JOINED,
+  };
+};
+
+export const initiateRTC = (stage) => {
+  return (dispatch) => {
+    return new Promise((resolve) => {
+      const computer = new RTCPeerConnection(config, webConnection);
+      dispatch(generateRTC(computer, stage));
+
+      if (stage === CREATING) {
+        const dataChannel = computer.createDataChannel('webrtc', {
+          reliable: true,
+        });
+
+        computer.onicecandidate = (e) => {
+          if (e.candidate != null) return;
+          dispatch(changeHostOffer(btoa(JSON.stringify(computer.localDescription))));
+          resolve();
+        };
+
+        computer
+          .createOffer()
+          .then(_ => computer.setLocalDescription(_))
+          .catch(errorHandler);
+
+        dispatch(addDataChannel(dataChannel));
+      } else {
+        computer.ondatachannel = (e) => {
+          const channel = e.channel || e;
+          dispatch(addDataChannel(channel));
+          resolve();
+        };
+      }
+
+    });
   };
 };

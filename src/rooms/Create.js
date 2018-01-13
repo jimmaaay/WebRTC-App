@@ -1,78 +1,79 @@
 import React, { Component, Fragment } from 'react';
 // import Clipboard from 'clipboard';
-import { config, connection, errorHandler } from './webrtc';
+import { connect } from 'react-redux';
+import {
+  initiateRTC,
+  addDataChannel,
+  changeHostOffer,
+  nextStep,
+  changePeerOffer,
+} from '../actions/connection';
+import { CREATING } from '../constants';
+import { errorHandler } from './webrtc';
 
 class Create extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      step: 0, // 0 based steps ;)
-      offer: '',
-      peerResponse: '',
-    };
-    
+  
     this.sentOffer = this.sentOffer.bind(this);
     this.peerResponseChange = this.peerResponseChange.bind(this);
     this.confirm = this.confirm.bind(this);
-
   }
+
   componentDidMount() {
-    const { computer, returnDataChannel } = this.props;
+    this.props.initiateRTC(CREATING);
+  }
 
-    this.dataChannel = computer.createDataChannel('webrtc', {
-      reliable: true,
-    });
-
-    returnDataChannel(this.dataChannel);
-
-    computer.onicecandidate = (e) => {
-      if (e.candidate != null) return;
-      this.setState({
-        ...this.state,
-        offer: btoa(JSON.stringify(computer.localDescription))
+  componentWillReceiveProps(nextProps) {
+    const { computer } = this.props.connection;
+    if (computer === false && nextProps.connection.computer instanceof RTCPeerConnection) {
+      const { computer } = nextProps.connection;
+      const dataChannel = computer.createDataChannel('webrtc', {
+        reliable: true,
       });
+
+      computer.onicecandidate = (e) => {
+        if (e.candidate != null) return;
+        this.props.changeHostOffer(btoa(JSON.stringify(computer.localDescription)));
+      }
+
+      computer
+        .createOffer()
+        .then(_ => computer.setLocalDescription(_))
+        .catch(errorHandler);
+
+      this.props.addDataChannel(dataChannel);
     }
 
-    computer
-      .createOffer()
-      .then(_ => computer.setLocalDescription(_))
-      .catch(errorHandler);
-
-    
   }
 
   peerResponseChange({target}) {
-    this.setState({
-      ...this.state,
-      peerResponse: target.value,
-    });
+    this.props.changePeerOffer(target.value);
   }
 
   sentOffer() {
-    this.setState({
-      ...this.state,
-      step: 1,
-    });
+    this.props.nextStep();
   }
 
-
   confirm() {
+    const { peerOffer, computer } = this.props.connection;
     let obj;
     try {
-      obj = JSON.parse(atob(this.state.peerResponse))
+      obj = JSON.parse(atob(peerOffer))
     } catch(e) {
       console.log(e);
     }
     const answer = new RTCSessionDescription(obj);
-    this.props.computer.setRemoteDescription(answer);
+    computer.setRemoteDescription(answer);
   }
 
   render() {
-    const content =  this.state.step === 0
+    const { hostOffer, step, peerOffer } = this.props.connection;
+    const content = step === 0
     ? (
       <Fragment>
         <label>Send this to the person you want to connect to</label>
-        <input type="text" value={this.state.offer} id="offer"/>
+        <input type="text" value={hostOffer} id="offer"/>
         {/* { button } */}
         <button onClick={this.sentOffer}>Sent</button>
       </Fragment>
@@ -80,7 +81,7 @@ class Create extends Component {
     : (
       <Fragment>
         <label>Please paste the response from the peer</label>
-        <input type="text" value={this.state.peerResponse} onChange={this.peerResponseChange} />
+        <input type="text" value={peerOffer} onChange={this.peerResponseChange} />
         <button onClick={this.confirm}>Confirm</button>
       </Fragment>
     );
@@ -93,5 +94,20 @@ class Create extends Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  return {
+    connection: state.connection,
+  };
+};
 
-export default Create;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    initiateRTC: _ => dispatch(initiateRTC(_)),
+    addDataChannel: _ => dispatch(addDataChannel(_)),
+    changeHostOffer: _ => dispatch(changeHostOffer(_)),
+    nextStep: _ => dispatch(nextStep()),
+    changePeerOffer: _ => dispatch(changePeerOffer(_)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Create);

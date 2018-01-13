@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import RoomButtons from './RoomButtons';
 import Create from './rooms/Create';
 import Join from './rooms/Join';
-import { config, connection } from './rooms/webrtc';
 import './App.css';
 
 const rooms = {
@@ -18,30 +17,6 @@ class App extends Component {
     };
 
     this.pickedRoomType = this.pickedRoomType.bind(this);
-    this.recievedDataChannel = this.recievedDataChannel.bind(this);
-  }
-
-  recievedDataChannel(dataChannel) {
-    dataChannel.onopen = () => {
-      console.log('opened data channel');
-    };
-  
-    dataChannel.onmessage = (e) => {
-      console.log(e);
-    };
-
-    dataChannel.onclose = (e) => {
-      console.log(e);
-    };
-
-    dataChannel.onerror = (e) => {
-      console.log(e);
-    };
-
-  }
-
-  componentDidMount() {
-    this.computer = new RTCPeerConnection(config, connection);
   }
 
   pickedRoomType(roomType) {
@@ -56,7 +31,7 @@ class App extends Component {
     ? <RoomButtons onRoom={this.pickedRoomType} />
     : (() => {
       const Room = rooms[this.state.room];
-      return <Room computer={this.computer} returnDataChannel={this.recievedDataChannel}/>
+      return <Room/>
     })();
 
     return (

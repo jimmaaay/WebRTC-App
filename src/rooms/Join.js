@@ -1,41 +1,47 @@
 import React, { Component, Fragment } from 'react';
-import { config, connection, sdpConstraints, errorHandler } from './webrtc';
+import { connect } from 'react-redux';
+import {
+  initiateRTC,
+  addDataChannel,
+  changeHostOffer,
+  nextStep,
+  changePeerOffer,
+} from '../actions/connection';
+import { sdpConstraints, errorHandler } from './webrtc';
+import { JOINING } from '../constants';
 
 class Join extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      step: 0, // 0 based steps ;)
-      hostOffer: '',
-      myOffer: '',
-    };
 
-    
     this.hostOfferChange = this.hostOfferChange.bind(this);
     this.confirmOffer = this.confirmOffer.bind(this);
   }
 
   componentDidMount() {
-    const { computer, returnDataChannel } = this.props;
-    computer.ondatachannel = (e) => {
-      const channel = e.channel || e;
-      returnDataChannel(channel);
-    };
+    this.props.initiateRTC(JOINING);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { computer } = nextProps.connection;
+    if (this.props.connection.computer === false && computer instanceof RTCPeerConnection) {
+      computer.ondatachannel = (e) => {
+        const channel = e.channel || e;
+        this.props.addDataChannel(channel);
+      };
+    }
   }
 
 
-  hostOfferChange(e) {
-    this.setState({
-      ...this.state,
-      hostOffer: e.target.value,
-    });
+  hostOfferChange({target}) {
+    this.props.changeHostOffer(target.value);
   }
 
   confirmOffer(e) {
-    const { computer } = this.props;
+    const { computer, hostOffer } = this.props.connection;
     let obj;
     try {
-      obj = JSON.parse(atob(this.state.hostOffer));
+      obj = JSON.parse(atob(hostOffer));
     } catch(e) {
       console.log(e);
     }
@@ -48,28 +54,26 @@ class Join extends Component {
 
     computer.onicecandidate = (e) => {
       if (e.candidate != null) return;
-      this.setState({
-        ...this.state,
-        myOffer: btoa(JSON.stringify(computer.localDescription)),
-        step: 1,
-      });
+      this.props.changePeerOffer(btoa(JSON.stringify(computer.localDescription)));
     };
 
+    this.props.nextStep();
   }
 
   render() {
-    const content = this.state.step === 0
+    const { step, hostOffer, peerOffer } = this.props.connection;
+    const content = step === 0
     ? (
       <Fragment>
         <label>Paste the hosts offer</label>
-        <input type="text" value={this.state.hostOffer} onChange={this.hostOfferChange} />
+        <input type="text" value={hostOffer} onChange={this.hostOfferChange} />
         <button onClick={this.confirmOffer}>Confirm</button>
       </Fragment>
     )
     : (
       <Fragment>
         <label>Send this to the host</label>
-        <input type="text" value={this.state.myOffer} />
+        <input type="text" value={peerOffer} />
       </Fragment>
     );
 
@@ -81,4 +85,20 @@ class Join extends Component {
   }
 }
 
-export default Join;
+const mapStateToProps = (state) => {
+  return {
+    connection: state.connection,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    initiateRTC: _ => dispatch(initiateRTC(_)),
+    addDataChannel: _ => dispatch(addDataChannel(_)),
+    changeHostOffer: _ => dispatch(changeHostOffer(_)),
+    nextStep: _ => dispatch(nextStep()),
+    changePeerOffer: _ => dispatch(changePeerOffer(_)),
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Join);

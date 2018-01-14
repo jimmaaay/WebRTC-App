@@ -7,7 +7,6 @@ import {
   NOT_CONNECTED,
 } from '../constants';
 import { config, connection as webConnection } from '../rooms/webrtc';
-import { joined } from '../actions/connection';
 
 const defaultState = {
   stage: NOT_CONNECTED, // NOT_CONNECTED, JOINING, CREATING, CONNECTED
@@ -22,8 +21,10 @@ const connection = (state = defaultState, action) => {
 
   switch (action.type) {
 
+    // TODO remove event listeners & destroy any active connections
+    // if computer and dataChannel are already set
     case CONNECTION_INITIATE_RTC:
-      return { ...state, computer: action.computer, stage: action.stage };
+      return { ...defaultState, computer: action.computer, stage: action.stage };
 
     case CONNECTION_ADD_DATA_CHANNEL:
       return { ...state, dataChannel: action.dataChannel };

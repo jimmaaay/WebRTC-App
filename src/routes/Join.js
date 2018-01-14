@@ -6,7 +6,7 @@ import {
   nextStep,
   changePeerOffer,
 } from '../actions/connection';
-import { sdpConstraints, errorHandler } from './webrtc';
+import { sdpConstraints, errorHandler } from '../rooms/webrtc';
 import { JOINING } from '../constants';
 
 class Join extends Component {

@@ -7,7 +7,7 @@ import {
   changePeerOffer,
 } from '../actions/connection';
 import { CREATING } from '../constants';
-import { errorHandler } from './webrtc';
+import { errorHandler } from '../rooms/webrtc';
 
 class Create extends Component {
   constructor(props) {

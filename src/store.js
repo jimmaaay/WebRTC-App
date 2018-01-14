@@ -2,6 +2,8 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk'
 
 import connection from './reducers/connection';
+import { joined } from './actions/connection';
+
 
 const store = createStore(
   combineReducers({
@@ -11,12 +13,13 @@ const store = createStore(
 );
 
 const addEventListeners = (dataChannel) => {
-  if (dataChannel.readyState === 'open') {
-    console.log('already opened conn');
-  }
-  dataChannel.onopen = () => {
-    console.log('opened data channel');
+  const onOpen = () => {
+    console.log('opened connection');
+    store.dispatch(joined());
   };
+
+  if (dataChannel.readyState === 'open') onOpen();
+  dataChannel.onopen = onOpen;
 
   dataChannel.onmessage = (e) => {
     console.log(e);
@@ -29,6 +32,7 @@ const addEventListeners = (dataChannel) => {
   dataChannel.onerror = (e) => {
     console.log(e);
   };
+  
 };
 
 let setupDataChannelListeners = false;

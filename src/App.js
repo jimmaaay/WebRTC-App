@@ -1,50 +1,40 @@
-import React, { Component, Fragment } from 'react';
-import RoomButtons from './RoomButtons';
-import Create from './rooms/Create';
-import Join from './rooms/Join';
+import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+} from 'react-router-dom';
+import { connect } from 'react-redux';
+import BaseRoute from './routes/BaseRoute';
+import Create from './routes/Create';
+import Join from './routes/Join';
 import './App.css';
 
-const rooms = {
-  create: Create,
-  join: Join,
-};
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      room: false,
-    };
-
-    this.pickedRoomType = this.pickedRoomType.bind(this);
-  }
-
-  pickedRoomType(roomType) {
-    this.setState({
-      ...this.state,
-      room: roomType,
-    });
-  }
 
   render() {
-    const content = this.state.room === false 
-    ? <RoomButtons onRoom={this.pickedRoomType} />
-    : (() => {
-      const Room = rooms[this.state.room];
-      return <Room/>
-    })();
-
     return (
-      <Fragment>
-        <header className="header">
-          <h1 className="header__title">Welcome to React</h1>
-        </header>
-        <main>
-          { content }
-        </main>
-      </Fragment>
+      <Router>
+        <div>
+          <header className="header">
+            <h1 className="header__title">Welcome to React</h1>
+          </header>
+          <main>
+            <Route exact path="/" component={BaseRoute} />
+            <Route exact path="/create" component={Create}/>
+            <Route exact path="/join" component={Join} />
+          </main>
+        </div>
+      </Router>
     );
   }
+
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+
+  }
+};
+
+export default connect(mapStateToProps)(App);

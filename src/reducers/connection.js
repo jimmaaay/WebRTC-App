@@ -5,6 +5,8 @@ import {
   CONNECTION_CHANGE_PEER_OFFER,
   CONNECTION_NEXT_STEP,
   NOT_CONNECTED,
+  CONNECTION_JOINED,
+  CONNECTED,
 } from '../constants';
 import { config, connection as webConnection } from '../rooms/webrtc';
 
@@ -37,6 +39,9 @@ const connection = (state = defaultState, action) => {
 
     case CONNECTION_CHANGE_PEER_OFFER:
       return { ...state, peerOffer: action.offer };
+
+    case CONNECTION_JOINED:
+      return { ...state, stage: CONNECTED} ;
 
     default:
       return state;

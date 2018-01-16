@@ -1,0 +1,6 @@
+.base-route {
+  display: flex;
+  justify-content: space-between;
+  max-width: 30rem;
+  margin: 0 auto;
+}

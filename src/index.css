@@ -30,6 +30,7 @@ button,
   margin: 0 0 1.5rem;
   text-decoration: none;
   font: inherit;
+  border: none;
 }
 
 .button:hover,

@@ -35,7 +35,7 @@ class App extends Component {
       <div>
         <header className="header">
           <h1 className="header__title">
-            <Link to="/">WebRTC App</Link>
+            <Link to="/">WebRTC Chat App</Link>
           </h1>
         </header>
         <main>

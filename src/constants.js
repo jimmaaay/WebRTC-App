@@ -9,3 +9,7 @@ export const NOT_CONNECTED = 'NOT_CONNECTED';
 export const JOINING = 'JOINING';
 export const CREATING = 'CREATING';
 export const CONNECTED = 'CONNECTED';
+
+export const SENDING_MESSAGE = 'SENDING_MESSAGE';
+export const TYPING_MESSAGE = 'TYPING_MESSAGE';
+export const RECIEVED_MESSAGE = 'RECIEVED_MESSAGE';

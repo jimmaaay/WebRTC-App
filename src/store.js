@@ -2,12 +2,15 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk'
 
 import connection from './reducers/connection';
+import chat from './reducers/chat';
 import { joined } from './actions/connection';
+import { recievedMessage } from './actions/chat';
 
 
 const store = createStore(
   combineReducers({
     connection,
+    chat,
   }),
   applyMiddleware(ReduxThunk)
 );
@@ -18,11 +21,11 @@ const addEventListeners = (dataChannel) => {
     store.dispatch(joined());
   };
 
-  if (dataChannel.readyState === 'open') onOpen();
+  // if (dataChannel.readyState === 'open') onOpen();
   dataChannel.onopen = onOpen;
 
   dataChannel.onmessage = (e) => {
-    console.log(e);
+    store.dispatch(recievedMessage(JSON.parse(e.data)));
   };
 
   dataChannel.onclose = (e) => {
@@ -46,5 +49,7 @@ store.subscribe(() => {
     addEventListeners(dataChannel);
   }
 });
+
+window.store = store;
 
 export default store;

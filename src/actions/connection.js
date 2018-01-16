@@ -6,7 +6,6 @@ import {
   CONNECTION_CHANGE_PEER_OFFER,
   CONNECTION_JOINED,
   CREATING,
-  JOINING,
 } from '../constants';
 
 import { config, connection as webConnection, errorHandler } from '../rooms/webrtc';

@@ -8,7 +8,6 @@ import {
   CONNECTION_JOINED,
   CONNECTED,
 } from '../constants';
-import { config, connection as webConnection } from '../rooms/webrtc';
 
 const defaultState = {
   stage: NOT_CONNECTED, // NOT_CONNECTED, JOINING, CREATING, CONNECTED
@@ -17,6 +16,7 @@ const defaultState = {
   hostOffer: '',
   peerOffer: '',
   step: 0, // 0 or 1
+  connectedTime: false,
 };
 
 const connection = (state = defaultState, action) => {
@@ -41,7 +41,7 @@ const connection = (state = defaultState, action) => {
       return { ...state, peerOffer: action.offer };
 
     case CONNECTION_JOINED:
-      return { ...state, stage: CONNECTED} ;
+      return { ...state, stage: CONNECTED, connectedTime: Date.now() };
 
     default:
       return state;

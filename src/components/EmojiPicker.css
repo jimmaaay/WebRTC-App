@@ -1,0 +1,23 @@
+.emoji-picker {
+  position: relative;
+}
+
+.emoji-picker__popup {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+}
+
+.emoji-picker__list {
+  display: flex;
+  flex-wrap: wrap;
+  width: 20rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emoji-picker__list li {
+  display: block;
+  width: 25%;
+}

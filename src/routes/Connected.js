@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { typingMessage, sendMessage } from '../actions/chat';
-import './Connected.css';
+import EmojiPicker from '../components/EmojiPicker';
+import ChatWindow from '../components/ChatWindow';
 
 class Connected extends Component {
 
@@ -67,28 +68,22 @@ class Connected extends Component {
     typingMessage(e.target.value);
   }
 
-  componentDidUpdate(prevProps) {
-    const { messages } = this.props;
-    const { messages: oldMessages } = prevProps;
-    // messages & oldMessages will be same object if no new messages??
-    if (messages !== oldMessages) {
-      const { textBox } = this;
-      textBox.scrollTop = textBox.scrollHeight - textBox.clientHeight;
-    }
-
-  }
-
   render() {
+
     return (
-      <div className="chat-window">
-        <div className="chat-window__text-box" ref={(ref) => this.textBox = ref}>{this.chatBox()}</div>
-        <form onSubmit={this.sendMessage} className="chat-window__bottom">
-          <input type="text" value={this.props.currentMessage} onChange={this.changeMessage} />
-          <button type="submit">Send</button>
-        </form>
+      <div>
+        <ChatWindow 
+          sendMessage={this.sendMessage} 
+          currentMessage={this.props.currentMessage} 
+          changeMessage={this.changeMessage}
+          messages={this.props.messages}
+          connectedTime={this.props.connectedTime}
+        />
       </div>
-    )
+    );
+
   }
+
 }
 
 

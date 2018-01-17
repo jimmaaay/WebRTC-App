@@ -3,6 +3,7 @@ import ReduxThunk from 'redux-thunk'
 
 import connection from './reducers/connection';
 import chat from './reducers/chat';
+import emoji from './reducers/emoji';
 import { joined } from './actions/connection';
 import { recievedMessage } from './actions/chat';
 
@@ -11,6 +12,7 @@ const store = createStore(
   combineReducers({
     connection,
     chat,
+    emoji,
   }),
   applyMiddleware(ReduxThunk)
 );

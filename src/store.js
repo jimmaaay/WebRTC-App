@@ -1,19 +1,13 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk'
 
-import connection from './reducers/connection';
-import chat from './reducers/chat';
-import emoji from './reducers/emoji';
+import reducers from './reducers';
 import { joined } from './actions/connection';
 import { recievedMessage } from './actions/chat';
 
 
 const store = createStore(
-  combineReducers({
-    connection,
-    chat,
-    emoji,
-  }),
+  reducers,
   applyMiddleware(ReduxThunk)
 );
 
@@ -52,6 +46,12 @@ store.subscribe(() => {
   }
 });
 
-window.store = store;
+if (process.env.NODE_ENV !== 'production') {
+  if (module.hot) {
+    module.hot.accept('./reducers', () => {
+      store.replaceReducer(reducers);
+    });
+  }
+}
 
 export default store;

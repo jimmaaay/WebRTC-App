@@ -4,6 +4,12 @@ import './ChatWindow.css';
 
 class ChatWindow extends Component {
 
+  constructor(props) {
+    super(props);
+
+    this.pickedEmoji = this.pickedEmoji.bind(this);
+  }
+
   chatBox() {
     const { connectedTime, messages } = this.props;
 
@@ -47,6 +53,20 @@ class ChatWindow extends Component {
 
   }
 
+  pickedEmoji(emoji) {
+
+    return () => {
+      const { changeMessage, currentMessage } = this.props;
+      // Fake e.target.value
+      changeMessage({
+        target: {
+          value: currentMessage + emoji,
+        }
+      });
+    };
+
+  }
+
 
   render() {
     return (
@@ -54,8 +74,8 @@ class ChatWindow extends Component {
         <div className="chat-window__text-box" ref={(ref) => this.textBox = ref}>{this.chatBox()}</div>
         <form onSubmit={this.props.sendMessage} className="chat-window__bottom">
           <input type="text" value={this.props.currentMessage} onChange={this.props.changeMessage} />
-          <EmojiPicker />
-          <button type="submit">Send</button>
+          <EmojiPicker pickedEmoji={this.pickedEmoji} />
+          <button type="submit" className="chat-window__send">Send</button>
         </form>
       </div>
     )

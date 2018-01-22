@@ -9,8 +9,6 @@ const defaultState = {
 
 const emoji = (state = defaultState, action) => {
 
-  console.log(action);
-
   switch (action.type) {
 
     case TOGGLE_EMOJI_LIST:

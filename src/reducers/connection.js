@@ -7,6 +7,7 @@ import {
   NOT_CONNECTED,
   CONNECTION_JOINED,
   CONNECTED,
+  CONNECTION_INPUT_ERROR,
 } from '../constants';
 
 const defaultState = {
@@ -17,6 +18,7 @@ const defaultState = {
   peerOffer: '',
   step: 0, // 0 or 1
   connectedTime: false,
+  validationErrors: {}, // Keys will be page number that the error happened on
 };
 
 const connection = (state = defaultState, action) => {
@@ -26,7 +28,7 @@ const connection = (state = defaultState, action) => {
     // TODO remove event listeners & destroy any active connections
     // if computer and dataChannel are already set
     case CONNECTION_INITIATE_RTC:
-      return { ...defaultState, computer: action.computer, stage: action.stage };
+      return { ...defaultState, computer: action.computer, stage: action.stage, validationErrors: {} };
 
     case CONNECTION_ADD_DATA_CHANNEL:
       return { ...state, dataChannel: action.dataChannel };
@@ -35,13 +37,18 @@ const connection = (state = defaultState, action) => {
       return { ...state, hostOffer: action.offer };
 
     case CONNECTION_NEXT_STEP:
-      return { ...state, step: 1 };
+      return { ...state, step: 1, validationErrors: {} };
 
     case CONNECTION_CHANGE_PEER_OFFER:
       return { ...state, peerOffer: action.offer };
 
     case CONNECTION_JOINED:
       return { ...state, stage: CONNECTED, connectedTime: Date.now() };
+
+    case CONNECTION_INPUT_ERROR:
+      const validationErrors = {};
+      validationErrors[state.step] = action.message;
+      return { ...state, validationErrors };
 
     default:
       return state;

@@ -6,6 +6,7 @@ import {
   CONNECTION_CHANGE_PEER_OFFER,
   CONNECTION_JOINED,
   CREATING,
+  CONNECTION_INPUT_ERROR,
 } from '../constants';
 
 import { config, connection as webConnection, errorHandler } from '../rooms/webrtc';
@@ -42,6 +43,13 @@ export const changePeerOffer = (offer) => {
 export const nextStep = () => {
   return {
     type: CONNECTION_NEXT_STEP,
+  };
+};
+
+export const inputError = (message) => {
+  return {
+    message,
+    type: CONNECTION_INPUT_ERROR,
   };
 };
 

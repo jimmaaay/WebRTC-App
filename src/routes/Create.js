@@ -5,6 +5,7 @@ import {
   initiateRTC,
   nextStep,
   changePeerOffer,
+  inputError,
 } from '../actions/connection';
 import { CREATING } from '../constants';
 
@@ -36,26 +37,42 @@ class Create extends Component {
       obj = JSON.parse(atob(peerOffer))
     } catch(e) {
       console.log(e);
+      obj = false;
     }
-    const answer = new RTCSessionDescription(obj);
-    computer.setRemoteDescription(answer);
+
+    if (obj !== false) {
+      const answer = new RTCSessionDescription(obj);
+      computer.setRemoteDescription(answer)
+        .catch((e) => {
+          console.log(e);
+          this.props.inputError('Peer offer is not valid');
+        });
+    } else this.props.inputError('Peer offer is not valid');
+
   }
 
   render() {
-    const { hostOffer, step, peerOffer } = this.props.connection;
+    const { hostOffer, step, peerOffer, validationErrors } = this.props.connection;
+    const hasErrorMessage = validationErrors.hasOwnProperty(step);
+    const className = hasErrorMessage ? 'input-error' : '';
+    const errorMessage = hasErrorMessage
+    ? (<p className="error-message">{validationErrors[step]}</p>)
+    : null;
+
     const content = step === 0
     ? (
       <Fragment>
         <label>Send this to the person you want to connect to</label>
-        <input type="text" value={hostOffer} id="offer"/>
-        {/* { button } */}
+        <input type="text" value={hostOffer} id="offer" className={className} readOnly />
+        { errorMessage }
         <button onClick={this.sentOffer}>Sent</button>
       </Fragment>
     )
     : (
       <Fragment>
         <label>Please paste the response from the peer</label>
-        <input type="text" value={peerOffer} onChange={this.peerResponseChange} />
+        <input type="text" value={peerOffer} onChange={this.peerResponseChange} className={className} />
+        { errorMessage }
         <button onClick={this.confirm}>Confirm</button>
       </Fragment>
     );
@@ -79,6 +96,7 @@ const mapDispatchToProps = (dispatch) => {
     initiateRTC: _ => dispatch(initiateRTC(_)),
     nextStep: _ => dispatch(nextStep()),
     changePeerOffer: _ => dispatch(changePeerOffer(_)),
+    inputError: _ => dispatch(inputError(_)),
   };
 };
 

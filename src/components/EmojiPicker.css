@@ -6,6 +6,8 @@
   position: absolute;
   bottom: 100%;
   right: 0;
+  box-shadow: 0 0 5px 5px rgba(0,0,0,0.1);
+  background: #fff;
 }
 
 .emoji-picker__list {
@@ -21,3 +23,22 @@
   display: block;
   width: 25%;
 }
+
+.emoji-picker__button {
+  margin: 0;
+  background: #fff;
+}
+
+.emoji-picker__next,
+.emoji-picker__prev {
+  background: #efefef;
+  margin: 0;
+}
+
+.emoji-picker__buttons {
+  display: flex;
+}
+
+.emoji-picker__buttons [disabled] {
+  opacity: 0.4;
+} 

@@ -5,7 +5,6 @@ import { toggleEmojiList, changeEmojiPage } from '../actions/emoji';
 import './EmojiPicker.css';
 
 const EMOJI_PER_PAGE = 20;
-const MAX_PAGE = 100; // TODO: set max page
 
 class EmojiPicker extends Component {
 
@@ -16,6 +15,7 @@ class EmojiPicker extends Component {
 
   changePage({target}) {
     const { emoji } = this.props;
+    const MAX_PAGE = Math.ceil(emojis.length / EMOJI_PER_PAGE) - 1;
     const type = target.getAttribute('data-type');
     let page;
     if (type === 'prev')  page = emoji.page - 1;
@@ -25,26 +25,50 @@ class EmojiPicker extends Component {
 
     if (page > MAX_PAGE) page = MAX_PAGE;
 
-    console.log(emoji.page, page);
-
     this.props.changeEmojiPage(page);
     
   }
 
   returnList() {
-    const { emoji } = this.props;
+    const { emoji, pickedEmoji } = this.props;
+    const prevDisabled = emoji.page === 0;
+    const nextDisabled = (Math.ceil(emojis.length / EMOJI_PER_PAGE) - 1) === emoji.page;
+
+
     return (
       <div className="emoji-picker__popup">
         <ul className="emoji-picker__list">
           { emojis
             .slice(emoji.page * EMOJI_PER_PAGE, (emoji.page + 1) * EMOJI_PER_PAGE)
             .map((emoji) => {
-              return <li key={emoji}>{emoji}</li>
+              return (
+              <li key={emoji}>
+                <button onClick={pickedEmoji(emoji)} type="button" className="emoji-picker__button">
+                  {emoji}
+                </button>
+              </li>
+              );
             }) 
           }
         </ul>
-        <button onClick={this.changePage} data-type="prev" type="button">Prev</button>
-        <button onClick={this.changePage} data-type="next" type="button">Next</button>
+        <div className="emoji-picker__buttons">
+          <button 
+            onClick={this.changePage} 
+            data-type="prev" 
+            type="button"
+            className="emoji-picker__prev"
+            disabled={prevDisabled}>
+            Prev
+          </button>
+          <button 
+            onClick={this.changePage} 
+            data-type="next" 
+            type="button"
+            className="emoji-picker__next"
+            disabled={nextDisabled}>
+            Next
+          </button>
+        </div>
       </div>
     );
   }

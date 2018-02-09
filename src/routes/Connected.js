@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { typingMessage, sendMessage } from '../actions/chat';
-import EmojiPicker from '../components/EmojiPicker';
 import ChatWindow from '../components/ChatWindow';
 
 class Connected extends Component {

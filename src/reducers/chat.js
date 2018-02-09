@@ -2,11 +2,20 @@ import {
   SENDING_MESSAGE,
   TYPING_MESSAGE,
   RECIEVED_MESSAGE,
+  TOGGLE_NOTIFICATIONS,
+  TOGGLE_SENDING_NOTIFICATIONS,
 } from '../constants';
 
 const defaultState = {
   messages: {},
   currentMessage: '',
+
+
+  // If notifications should be sent when the window isn't in view
+  sendNotifications: false,
+
+  // If the current message recieved should be sent as a notification
+  shouldBeSendingNotifications: false,
 };
 
 const chat = (state = defaultState, action) => {
@@ -31,7 +40,15 @@ const chat = (state = defaultState, action) => {
 
     case TYPING_MESSAGE:
       return { ...state, currentMessage: action.message };
-      
+
+    case TOGGLE_NOTIFICATIONS:
+      const sendNotifications = action.value === 'auto' ? !state.sendNotifications : action.value;
+      const sBSN = sendNotifications === false ? false : state.shouldBeSendingNotifications; 
+      return { ...state, sendNotifications, shouldBeSendingNotifications: sBSN };
+
+    case TOGGLE_SENDING_NOTIFICATIONS:
+      const shouldBeSendingNotifications = action.value === 'auto' ? !state.shouldBeSendingNotifications : action.value;
+      return { ...state, shouldBeSendingNotifications };
 
     default:
       return state;

@@ -17,7 +17,7 @@ const addEventListeners = (dataChannel) => {
     store.dispatch(joined());
   };
 
-  // if (dataChannel.readyState === 'open') onOpen();
+  if (dataChannel.readyState === 'open') onOpen();
   dataChannel.onopen = onOpen;
 
   dataChannel.onmessage = (e) => {

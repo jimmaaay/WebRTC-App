@@ -68,6 +68,57 @@ main {
   text-decoration: none;
 }
 
+.header__notification {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent !important;
+  width: 4rem;
+  padding: 1rem;
+  line-height: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.header__notification::before {
+  content: '';
+  display: block;
+  width: 2.5rem; 
+  height: 0.25rem;
+  background: #fff;
+  position: absolute;
+  top: 35%;
+  left: 61%;
+  transform-origin: left top;
+  margin-left: -1.25rem;
+  margin-top: -0.125rem;
+  transition: transform 0.5s ease-in-out;
+}
+
+.header__notification {
+  opacity: 0.4;
+}
+
+.header__notification::before {
+  transform: rotate(45deg);
+}
+
+.header__notification:hover,
+.header__notification:focus {
+  opacity: 1;
+}
+
+/* Having scaleX(0) in chrome 63 was making the animation not fire */
+.header__notification.header__notification--granted::before {
+  transform: rotate(45deg) scaleX(0.00001);
+}
+
+
+
+.header__notification svg {
+  fill: #fff;
+}
+
+
 label {
   margin-bottom: 1.5rem;
   display: block;

@@ -4,6 +4,17 @@ const defaultState = {
   open: false,
   recent: [], // last 10 recently used items
   page: 0,
+  currentCategory: false, // false means all
+  knownCategories: [
+    'people',
+    'animals_and_nature',
+    'food_and_drink',
+    'activity',
+    'travel_and_places',
+    'objects',
+    'flags',
+    'symbols',
+  ],
 };
 
 

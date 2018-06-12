@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "emojis-list": "^2.1.0",
+    "emojilib": "^2.2.12",
     "object-assign": "4.1.1",
     "promise": "8.0.1",
     "raf": "3.4.0",

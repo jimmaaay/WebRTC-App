@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import emojis from 'emojis-list';
+import { lib as emojiLib } from 'emojilib';
 import { connect } from 'react-redux';
 import { toggleEmojiList, changeEmojiPage } from '../actions/emoji';
 import './EmojiPicker.css';
@@ -15,7 +15,7 @@ class EmojiPicker extends Component {
 
   changePage({target}) {
     const { emoji } = this.props;
-    const MAX_PAGE = Math.ceil(emojis.length / EMOJI_PER_PAGE) - 1;
+    const MAX_PAGE = Math.ceil(Object.keys(emojiLib).length / EMOJI_PER_PAGE) - 1;
     const type = target.getAttribute('data-type');
     let page;
     if (type === 'prev')  page = emoji.page - 1;
@@ -26,30 +26,58 @@ class EmojiPicker extends Component {
     if (page > MAX_PAGE) page = MAX_PAGE;
 
     this.props.changeEmojiPage(page);
-    
   }
 
   returnList() {
+    // TODO: optimise way of getting emojis. Should generate an array from the beggining
+    // TODO: stop emojiLib pulling through custom emojis? ( see last page of emoji picker )
     const { emoji, pickedEmoji } = this.props;
-    const prevDisabled = emoji.page === 0;
-    const nextDisabled = (Math.ceil(emojis.length / EMOJI_PER_PAGE) - 1) === emoji.page;
+    const {
+      currentCategory,
+      page,
+      knownCategories,
+    } = emoji;
+    const prevDisabled = false;
+    const nextDisabled = false;
+
+    const filteredEmojis = currentCategory === false
+    ? emojiLib
+    : Object.keys(emojiLib)
+      .reduce((ret, key) => {
+        const { category } = emojiLib[key];
+        if (category === currentCategory) {
+          ret[key] = emojiLib[key];
+        }
+        return ret;
+      }, {});
+
+    const itemsToShow = Object.keys(filteredEmojis)
+      .slice(page * EMOJI_PER_PAGE, (page + 1) * EMOJI_PER_PAGE)
+      .map(key => emojiLib[key]);
 
 
     return (
       <div className="emoji-picker__popup">
-        <ul className="emoji-picker__list">
-          { emojis
-            .slice(emoji.page * EMOJI_PER_PAGE, (emoji.page + 1) * EMOJI_PER_PAGE)
-            .map((emoji) => {
-              return (
-              <li key={emoji}>
-                <button onClick={pickedEmoji(emoji)} type="button" className="emoji-picker__button">
-                  {emoji}
-                </button>
+        <ul className="emoji-picker__categories">
+          { knownCategories.map((category) => {
+            // TODO: add icons for the known categories
+            return (
+              <li key={category}>
+                {category.slice(0, 1)}
               </li>
-              );
-            }) 
-          }
+            );
+          }) }
+        </ul>
+        <ul className="emoji-picker__list">
+          { itemsToShow.map(({ char }) => {
+            return (
+            <li key={char}>
+              <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
+                {char}
+              </button>
+            </li>
+            );
+          }) }
         </ul>
         <div className="emoji-picker__buttons">
           <button 

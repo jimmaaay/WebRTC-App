@@ -42,3 +42,12 @@
 .emoji-picker__buttons [disabled] {
   opacity: 0.4;
 } 
+
+
+.emoji-picker__categories {
+  display: flex;
+  list-style: none;
+  justify-content: space-between;
+  padding: 1rem;
+  margin: 0;
+}

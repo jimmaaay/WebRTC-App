@@ -17,9 +17,11 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  height: 15rem;
+  overflow: auto;
 }
 
-.emoji-picker__list li {
+.emoji-picker__list__item {
   display: block;
   width: 25%;
 }
@@ -27,21 +29,12 @@
 .emoji-picker__button {
   margin: 0;
   background: #fff;
-}
-
-.emoji-picker__next,
-.emoji-picker__prev {
-  background: #efefef;
-  margin: 0;
-}
-
-.emoji-picker__buttons {
+  height: 3rem;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.emoji-picker__buttons [disabled] {
-  opacity: 0.4;
-} 
 
 
 .emoji-picker__categories {

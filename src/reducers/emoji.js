@@ -2,8 +2,8 @@ import { TOGGLE_EMOJI_LIST, EMOJI_CHANGE_PAGE } from '../constants';
 
 const defaultState = {
   open: false,
-  recent: [], // last 10 recently used items
-  page: 0,
+  recent: [], // last X recently used items
+  // page: 0,
   currentCategory: false, // false means all
   knownCategories: [
     'people',

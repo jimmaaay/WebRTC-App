@@ -77,7 +77,7 @@ class Join extends Component {
         <label>Paste the hosts offer</label>
         <input type="text" value={hostOffer} onChange={this.hostOfferChange} className={className} />
         { errorMessage }
-        <button onClick={this.confirmOffer}>Confirm</button>
+        <button onClick={this.confirmOffer} className="button">Confirm</button>
       </Fragment>
     )
     : (

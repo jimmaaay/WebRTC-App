@@ -75,7 +75,7 @@ class ChatWindow extends Component {
         <form onSubmit={this.props.sendMessage} className="chat-window__bottom">
           <input type="text" value={this.props.currentMessage} onChange={this.props.changeMessage} />
           <EmojiPicker pickedEmoji={this.pickedEmoji} />
-          <button type="submit" className="chat-window__send">Send</button>
+          <button type="submit" className="button chat-window__send">Send</button>
         </form>
       </div>
     )

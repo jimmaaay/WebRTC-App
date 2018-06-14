@@ -1,20 +1,14 @@
-import { TOGGLE_EMOJI_LIST, EMOJI_CHANGE_PAGE } from '../constants';
+import {
+  TOGGLE_EMOJI_LIST,
+  EMOJI_CHANGE_CURRENT_CATEGORY,
+  EMOJI_CHANGE_SCROLL_TOP,
+} from '../constants';
 
 const defaultState = {
   open: false,
   recent: [], // last X recently used items
-  // page: 0,
-  currentCategory: false, // false means all
-  knownCategories: [
-    'people',
-    'animals_and_nature',
-    'food_and_drink',
-    'activity',
-    'travel_and_places',
-    'objects',
-    'flags',
-    'symbols',
-  ],
+  currentCategory: 'people',
+  scrollTop: 0,
 };
 
 
@@ -22,11 +16,18 @@ const emoji = (state = defaultState, action) => {
 
   switch (action.type) {
 
-    case TOGGLE_EMOJI_LIST:
+    case TOGGLE_EMOJI_LIST: {
       return { ...state, open: !state.open };
+    }
 
-    case EMOJI_CHANGE_PAGE:
-      return { ...state, page: action.page };
+    case EMOJI_CHANGE_CURRENT_CATEGORY: {
+      return { ...state, currentCategory: action.category };
+    }
+
+    case EMOJI_CHANGE_SCROLL_TOP: {
+      return { ...state, scrollTop: action.scrollTop };
+    }
+
 
     default:
       return state;

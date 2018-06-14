@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { lib as emojiLib } from 'emojilib';
 import { List } from 'react-virtualized';
 import { connect } from 'react-redux';
-import { toggleEmojiList } from '../actions/emoji';
+import {
+  toggleEmojiList,
+  changeCurrentCatgeory,
+  changeScrollTop,
+} from '../actions/emoji';
 import './EmojiPicker.css';
 
 const fullEmojiList = Object.keys(emojiLib)
@@ -28,54 +32,81 @@ const emojisByCategory = fullEmojiListAsArray.reduce((obj, emoji) => {
   return obj;
 }, {});
 
+const emojiCategories = [
+  'people',
+  'animals_and_nature',
+  'food_and_drink',
+  'activity',
+  'travel_and_places',
+  'objects',
+  'flags',
+  'symbols',
+];
+
+const normaliseCategoryTitle = title => {
+  const tempTitle = title.replace(/_(\w)/g, (_, char) => ` ${char.toUpperCase()}`);
+  return tempTitle[0].toUpperCase() + tempTitle.slice(1);
+}
+
+const getLastTitleInView = (titles, scrollTop) => {
+  return titles.reduce((ret, obj) => {
+    const { y } = obj;
+    if (ret === false) return obj;
+    if (y <= scrollTop) return obj;
+    return ret;
+  }, false);
+}
+
 const EMOJIS_PER_ROW = 4;
-const fontSize = parseInt(window.getComputedStyle(document.documentElement).fontSize);
+const fontSize = parseInt(window.getComputedStyle(document.documentElement).fontSize, 10);
+
+const titlePositions = [];
+
+const rows = emojiCategories.reduce((array, categoryName) => {
+  const emojiCat = emojisByCategory[categoryName];
+  const emojiArray = emojiCat.reduce((ret, emoji, i) => {
+    if (i % EMOJIS_PER_ROW === 0) ret.push([]);
+    ret[ret.length - 1].push(emoji);
+    return ret;
+  }, []);
+  const lastRow = emojiArray[emojiArray.length - 1];
+  if (lastRow.length < EMOJIS_PER_ROW) {
+    const newArray = lastRow.concat(new Array(EMOJIS_PER_ROW - lastRow.length).fill(null));
+    emojiArray[emojiArray.length - 1] = newArray;
+  }
+  emojiArray.unshift(categoryName);
+  titlePositions.push({
+    categoryName, 
+    y: array.length * fontSize * 3,
+  });
+  return array.concat(emojiArray);
+}, []);
+
 
 class EmojiPicker extends Component {
 
+  constructor(props) {
+    super(props);
+    this.listScroll = this.listScroll.bind(this);
+    this.categoryButtonClick = this.categoryButtonClick.bind(this);
+  }
+
+  listScroll({ scrollTop }) {
+    const {
+      currentCategory,
+      changeCurrentCatgeory,
+      changeScrollTop,
+    } = this.props;
+
+    changeScrollTop(scrollTop);
+    const lastInViewCategory = getLastTitleInView(titlePositions, scrollTop);
+
+    if (lastInViewCategory.categoryName === currentCategory) return;
+    changeCurrentCatgeory(lastInViewCategory.categoryName);
+  }
+
   getEmojiItems() {
-    const { pickedEmoji } = this.props;
-
-    const rows = [ [] ];
-
-    for (let key in emojisByCategory) {
-      const emojiCat = emojisByCategory[key];
-      emojiCat.forEach((emoji) => {
-        if (rows[rows.length - 1].length === 4) rows.push([]); //  only want 4 in a row
-        rows[rows.length -1].push(emoji);
-      });
-      const lastRow = rows[rows.length - 1];
-      if (lastRow.length < 4) {
-        const newArray = lastRow.concat(new Array(4 - lastRow.length).fill(null));
-        rows[rows.length - 1] = newArray;
-      }
-      
-    }
-
-    console.log(rows);
-
-    // const emojiRows = Object.keys(emojisByCategory)
-    //   .reduce((array, key) => {
-    //     const emojis = emojisByCategory[key];
-    //     const emptyButtonsToAdd = EMOJIS_PER_ROW - (emojis.length % EMOJIS_PER_ROW);
-    //     const newArray = emojis.concat(new Array(emptyButtonsToAdd).fill(null));
-    //     return array.concat(newArray);
-    //   }, [])
-    //   .reduce((newArray, arrayItem) => {
-
-    //   }, );
-      // .map((item, i) => {
-      //   if (item == null) return <div key={i} className="emoji-picker__list__item" />
-      //   const { char } = item;
-
-      //   return (
-      //     <div key={char} className="emoji-picker__list__item">
-      //       <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
-      //         {char}
-      //       </button>
-      //     </div>
-      //   );
-      // });
+    const { pickedEmoji, scrollTop } = this.props;
 
     return (
       <List 
@@ -83,10 +114,14 @@ class EmojiPicker extends Component {
         width={20 * fontSize}
         rowCount={rows.length}
         rowHeight={3 * fontSize}
-        rowRenderer={({ index }) => {
+        onScroll={this.listScroll}
+        scrollTop={scrollTop}
+        rowRenderer={({ index, key, style }) => {
           const row = rows[index];
-          const items = row.map((item, i) => {
-            if (item == null) return <div key={i} className="emoji-picker__list__item" />
+          const items = typeof row === 'string' 
+          ? <p className="emoji-picker__list__title">{normaliseCategoryTitle(row)}</p>
+          : row.map((item, i) => {
+            if (item == null) return <div key={i} className="emoji-picker__list__item" />;
             const { char } = item;
             return (
               <div key={char} className="emoji-picker__list__item">
@@ -97,51 +132,45 @@ class EmojiPicker extends Component {
             );
           });
           return (
-            <div key={index}>
+            <div key={key} style={style}>
               { items }
             </div>
           );
         }}
       />
-    )
+    );
 
-    // return Object.keys(emojisByCategory)
-    //   .reduce((array, key) => {
-    //     const emojis = emojisByCategory[key];
-    //     const emptyButtonsToAdd = EMOJIS_PER_ROW - (emojis.length % EMOJIS_PER_ROW);
-    //     const newArray = emojis.concat(new Array(emptyButtonsToAdd).fill(null));
-    //     return array.concat(newArray);
-    //   }, [])
-    //   .map((item, i) => {
-    //     if (item == null) return <div key={i} className="emoji-picker__list__item" />
-    //     const { char } = item;
+  }
 
-    //     return (
-    //       <div key={char} className="emoji-picker__list__item">
-    //         <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
-    //           {char}
-    //         </button>
-    //       </div>
-    //     );
-    //   });
-    
+  categoryButtonClick({ target }) {
+    const { changeScrollTop } = this.props;
+    const category = target.getAttribute('data-category');
+    const { y } = titlePositions.find(({ categoryName }) => {
+      return categoryName === category;
+    });
+    changeScrollTop(y);
   }
 
   returnList() {
-    const { emoji } = this.props;
-    const {
-      currentCategory,
-      knownCategories,
-    } = emoji;
+    const { currentCategory } = this.props;
 
     return (
       <div className="emoji-picker__popup">
         <ul className="emoji-picker__categories">
-          { knownCategories.map((category) => {
+          { emojiCategories.map((category) => {
+            const className = currentCategory === category
+            ? 'emoji-picker__category emoji-picker__category--active'
+            : 'emoji-picker__category';
             // TODO: add icons for the known categories
             return (
-              <li key={category}>
-                {category.slice(0, 1)}
+              <li key={category} className={className}>
+                <button 
+                  className="emoji-picker__category__button" 
+                  type="button"
+                  onClick={this.categoryButtonClick}
+                  data-category={category}>
+                  {category.slice(0, 1)}
+                </button>
               </li>
             );
           }) }
@@ -156,7 +185,7 @@ class EmojiPicker extends Component {
   render() {
     return (
       <div className="emoji-picker">
-        <button type="button" onClick={this.props.toggleEmojiList}>Emojis</button>
+        <button type="button" className="button" onClick={this.props.toggleEmojiList}>Emojis</button>
         { this.props.emoji.open ? this.returnList() : null }
       </div>
     );
@@ -165,15 +194,19 @@ class EmojiPicker extends Component {
 }
 
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ emoji }) => {
   return {
-    emoji: state.emoji,
+    emoji,
+    currentCategory: emoji.currentCategory,
+    scrollTop: emoji.scrollTop,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     toggleEmojiList: _ => dispatch(toggleEmojiList(_)),
+    changeCurrentCatgeory: _ => dispatch(changeCurrentCatgeory(_)),
+    changeScrollTop: _ => dispatch(changeScrollTop(_)),
   };
 };
 

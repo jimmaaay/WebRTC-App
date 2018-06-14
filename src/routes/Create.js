@@ -65,7 +65,7 @@ class Create extends Component {
         <label>Send this to the person you want to connect to</label>
         <input type="text" value={hostOffer} id="offer" className={className} readOnly />
         { errorMessage }
-        <button onClick={this.sentOffer}>Sent</button>
+        <button onClick={this.sentOffer} className="button">Sent</button>
       </Fragment>
     )
     : (
@@ -73,7 +73,7 @@ class Create extends Component {
         <label>Please paste the response from the peer</label>
         <input type="text" value={peerOffer} onChange={this.peerResponseChange} className={className} />
         { errorMessage }
-        <button onClick={this.confirm}>Confirm</button>
+        <button onClick={this.confirm} className="button">Confirm</button>
       </Fragment>
     );
 

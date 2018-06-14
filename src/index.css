@@ -21,7 +21,15 @@ h1, h2, h3, h4, h5, p {
   margin: 0 0 1.5rem;
 }
 
-button,
+button {
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  line-height: inherit;
+}
+
 .button {
   display: block;
   padding: 0.5rem 1rem;
@@ -38,8 +46,6 @@ button,
   cursor: pointer;
 }
 
-button:hover,
-button:focus,
 .button:hover,
 .button:focus {
   background: #ebadff;

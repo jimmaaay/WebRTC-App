@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { lib as emojiLib } from 'emojilib';
+import { List } from 'react-virtualized';
 import { connect } from 'react-redux';
 import { toggleEmojiList } from '../actions/emoji';
 import './EmojiPicker.css';
@@ -28,31 +29,101 @@ const emojisByCategory = fullEmojiListAsArray.reduce((obj, emoji) => {
 }, {});
 
 const EMOJIS_PER_ROW = 4;
+const fontSize = parseInt(window.getComputedStyle(document.documentElement).fontSize);
 
 class EmojiPicker extends Component {
 
   getEmojiItems() {
     const { pickedEmoji } = this.props;
 
-    return Object.keys(emojisByCategory)
-      .reduce((array, key) => {
-        const emojis = emojisByCategory[key];
-        const emptyButtonsToAdd = EMOJIS_PER_ROW - (emojis.length % EMOJIS_PER_ROW);
-        const newArray = emojis.concat(new Array(emptyButtonsToAdd).fill(null));
-        return array.concat(newArray);
-      }, [])
-      .map((item, i) => {
-        if (item == null) return <div key={i} className="emoji-picker__list__item" />
-        const { char } = item;
+    const rows = [ [] ];
 
-        return (
-          <div key={char} className="emoji-picker__list__item">
-            <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
-              {char}
-            </button>
-          </div>
-        );
+    for (let key in emojisByCategory) {
+      const emojiCat = emojisByCategory[key];
+      emojiCat.forEach((emoji) => {
+        if (rows[rows.length - 1].length === 4) rows.push([]); //  only want 4 in a row
+        rows[rows.length -1].push(emoji);
       });
+      const lastRow = rows[rows.length - 1];
+      if (lastRow.length < 4) {
+        const newArray = lastRow.concat(new Array(4 - lastRow.length).fill(null));
+        rows[rows.length - 1] = newArray;
+      }
+      
+    }
+
+    console.log(rows);
+
+    // const emojiRows = Object.keys(emojisByCategory)
+    //   .reduce((array, key) => {
+    //     const emojis = emojisByCategory[key];
+    //     const emptyButtonsToAdd = EMOJIS_PER_ROW - (emojis.length % EMOJIS_PER_ROW);
+    //     const newArray = emojis.concat(new Array(emptyButtonsToAdd).fill(null));
+    //     return array.concat(newArray);
+    //   }, [])
+    //   .reduce((newArray, arrayItem) => {
+
+    //   }, );
+      // .map((item, i) => {
+      //   if (item == null) return <div key={i} className="emoji-picker__list__item" />
+      //   const { char } = item;
+
+      //   return (
+      //     <div key={char} className="emoji-picker__list__item">
+      //       <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
+      //         {char}
+      //       </button>
+      //     </div>
+      //   );
+      // });
+
+    return (
+      <List 
+        height={15 * fontSize}
+        width={20 * fontSize}
+        rowCount={rows.length}
+        rowHeight={3 * fontSize}
+        rowRenderer={({ index }) => {
+          const row = rows[index];
+          const items = row.map((item, i) => {
+            if (item == null) return <div key={i} className="emoji-picker__list__item" />
+            const { char } = item;
+            return (
+              <div key={char} className="emoji-picker__list__item">
+                <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
+                  {char}
+                </button>
+              </div>
+            );
+          });
+          return (
+            <div key={index}>
+              { items }
+            </div>
+          );
+        }}
+      />
+    )
+
+    // return Object.keys(emojisByCategory)
+    //   .reduce((array, key) => {
+    //     const emojis = emojisByCategory[key];
+    //     const emptyButtonsToAdd = EMOJIS_PER_ROW - (emojis.length % EMOJIS_PER_ROW);
+    //     const newArray = emojis.concat(new Array(emptyButtonsToAdd).fill(null));
+    //     return array.concat(newArray);
+    //   }, [])
+    //   .map((item, i) => {
+    //     if (item == null) return <div key={i} className="emoji-picker__list__item" />
+    //     const { char } = item;
+
+    //     return (
+    //       <div key={char} className="emoji-picker__list__item">
+    //         <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
+    //           {char}
+    //         </button>
+    //       </div>
+    //     );
+    //   });
     
   }
 

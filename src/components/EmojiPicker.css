@@ -24,6 +24,7 @@
 .emoji-picker__list__item {
   display: block;
   width: 25%;
+  float: left;
 }
 
 .emoji-picker__button {

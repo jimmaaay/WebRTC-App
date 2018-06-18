@@ -47,6 +47,7 @@
   transition: background 0.3s ease-in-out;
 }
 
+
 .emoji-picker__button:hover,
 .emoji-picker__button:focus {
   background: #efefef;
@@ -65,14 +66,32 @@
 .emoji-picker__category {
   flex-grow: 1;
   flex-basis: 0;
+  line-height: 0;
+  border-bottom: 3px solid transparent;
 }
 
 .emoji-picker__category__button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   text-align: center;
+  padding: 0.5rem;
+  line-height: 1;
+  height: 100%;
+  opacity: 0.7;
+}
+
+.emoji-picker__category__button:hover,
+.emoji-picker__category__button:focus {
+  opacity: 0.9;
+}
+
+.emoji-picker__category__button img {
+  width: 100%;
+  display: block;
 }
 
 .emoji-picker__category--active {
-  background: red;
+  border-bottom-color: red;
 }

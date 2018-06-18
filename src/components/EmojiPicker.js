@@ -7,7 +7,31 @@ import {
   changeCurrentCatgeory,
   changeScrollTop,
 } from '../actions/emoji';
+import {
+  thisOrParentMatches,
+} from '../helpers'
 import './EmojiPicker.css';
+
+// Icons sourced from https://material.io/tools/icons/?style=outline
+import airplane from '../icons/airplane.svg';
+import fastfood from '../icons/fastfood.svg';
+import flag from '../icons/flag.svg';
+import person from '../icons/person.svg';
+import pets from '../icons/pets.svg';
+import pool from '../icons/pool.svg';
+import watch from '../icons/watch.svg';
+
+const icons = {
+  people: person,
+  animals_and_nature: pets,
+  food_and_drink: fastfood,
+  activity: pool,
+  travel_and_places: airplane,
+  objects: watch,
+  flags: flag,
+};
+
+// console.log(airplane);
 
 const fullEmojiList = Object.keys(emojiLib)
   .reduce((obj, key) => {
@@ -143,8 +167,10 @@ class EmojiPicker extends Component {
   }
 
   categoryButtonClick({ target }) {
+    const button = thisOrParentMatches(target, '.emoji-picker__category__button');
+    if (button === false) return;
     const { changeScrollTop } = this.props;
-    const category = target.getAttribute('data-category');
+    const category = button.getAttribute('data-category');
     const { y } = titlePositions.find(({ categoryName }) => {
       return categoryName === category;
     });
@@ -161,6 +187,11 @@ class EmojiPicker extends Component {
             const className = currentCategory === category
             ? 'emoji-picker__category emoji-picker__category--active'
             : 'emoji-picker__category';
+
+            const icon = icons.hasOwnProperty(category)
+            ? <img src={icons[category]} />
+            : category.slice(0, 1);
+
             // TODO: add icons for the known categories
             return (
               <li key={category} className={className}>
@@ -169,7 +200,7 @@ class EmojiPicker extends Component {
                   type="button"
                   onClick={this.categoryButtonClick}
                   data-category={category}>
-                  {category.slice(0, 1)}
+                  {icon}
                 </button>
               </li>
             );

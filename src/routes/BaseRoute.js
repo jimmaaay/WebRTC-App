@@ -10,7 +10,7 @@ class BaseRoute extends Component {
         <Link to="/create" className="button">Create</Link>
         <Link to="/join" className="button">Join</Link>
       </div>
-    )
+    );
   }
 
 }

@@ -7,6 +7,7 @@ import {
   CONNECTION_JOINED,
   CREATING,
   CONNECTION_INPUT_ERROR,
+  CONNECTION_DISCONNECTED,
 } from '../constants';
 
 import { config, connection as webConnection, errorHandler } from '../rooms/webrtc';
@@ -38,26 +39,32 @@ export const changePeerOffer = (offer) => {
     offer,
     type: CONNECTION_CHANGE_PEER_OFFER,
   };
-};
+}
 
 export const nextStep = () => {
   return {
     type: CONNECTION_NEXT_STEP,
   };
-};
+}
 
 export const inputError = (message) => {
   return {
     message,
     type: CONNECTION_INPUT_ERROR,
   };
-};
+}
 
 export const joined = () => {
   return {
     type: CONNECTION_JOINED,
   };
-};
+}
+
+export const disconnected = () => {
+  return {
+    type: CONNECTION_DISCONNECTED,
+  };
+}
 
 export const initiateRTC = (stage) => {
   return (dispatch) => {
@@ -74,7 +81,7 @@ export const initiateRTC = (stage) => {
           if (e.candidate != null) return;
           dispatch(changeHostOffer(btoa(JSON.stringify(computer.localDescription))));
           resolve();
-        };
+        }
 
         computer
           .createOffer()
@@ -87,9 +94,9 @@ export const initiateRTC = (stage) => {
           const channel = e.channel || e;
           dispatch(addDataChannel(channel));
           resolve();
-        };
+        }
       }
 
     });
-  };
-};
+  }
+}

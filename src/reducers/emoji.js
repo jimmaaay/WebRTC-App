@@ -2,6 +2,7 @@ import {
   TOGGLE_EMOJI_LIST,
   EMOJI_CHANGE_CURRENT_CATEGORY,
   EMOJI_CHANGE_SCROLL_TOP,
+  CONNECTION_DISCONNECTED,
 } from '../constants';
 
 const defaultState = {
@@ -26,6 +27,10 @@ const emoji = (state = defaultState, action) => {
 
     case EMOJI_CHANGE_SCROLL_TOP: {
       return { ...state, scrollTop: action.scrollTop };
+    }
+
+    case CONNECTION_DISCONNECTED: {
+      return { ...defaultState };
     }
 
 

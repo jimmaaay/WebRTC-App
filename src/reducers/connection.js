@@ -8,6 +8,7 @@ import {
   CONNECTION_JOINED,
   CONNECTED,
   CONNECTION_INPUT_ERROR,
+  CONNECTION_DISCONNECTED,
 } from '../constants';
 
 const defaultState = {
@@ -49,6 +50,9 @@ const connection = (state = defaultState, action) => {
       const validationErrors = {};
       validationErrors[state.step] = action.message;
       return { ...state, validationErrors };
+
+    case CONNECTION_DISCONNECTED: 
+      return { ...defaultState };
 
     default:
       return state;

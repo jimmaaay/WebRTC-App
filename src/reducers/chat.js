@@ -4,6 +4,7 @@ import {
   RECIEVED_MESSAGE,
   TOGGLE_NOTIFICATIONS,
   TOGGLE_SENDING_NOTIFICATIONS,
+  CONNECTION_DISCONNECTED,
 } from '../constants';
 
 const defaultState = {
@@ -49,6 +50,10 @@ const chat = (state = defaultState, action) => {
     case TOGGLE_SENDING_NOTIFICATIONS:
       const shouldBeSendingNotifications = action.value === 'auto' ? !state.shouldBeSendingNotifications : action.value;
       return { ...state, shouldBeSendingNotifications };
+
+
+    case CONNECTION_DISCONNECTED:
+      return { ...defaultState };
 
     default:
       return state;

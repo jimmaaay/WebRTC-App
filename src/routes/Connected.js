@@ -15,9 +15,21 @@ class Connected extends Component {
 
   componentDidMount() {
     const { history, dataChannel } = this.props;
-    // TODO: check dataChannel is actually connected??
     // Routes users back to the home page if a valid dataChannel is not present
     if (! (dataChannel instanceof window.RTCDataChannel)) {
+      history.push('/');
+    }
+
+  }
+
+  componentDidUpdate() {
+    const { history, dataChannel } = this.props;
+
+    if (! (dataChannel instanceof window.RTCDataChannel)) {
+      /*
+       *  TODO: don't redirect user back to home. Display a message which says chat is disconnected
+       *  and don't let them type anything in the chat box
+       */
       history.push('/');
     }
 
@@ -59,6 +71,7 @@ class Connected extends Component {
   sendMessage(e) {
     e.preventDefault();
     const { sendMessage, currentMessage } = this.props;
+    if (currentMessage.trim() === '') return; // stops being able to send empty messages
     sendMessage(currentMessage);
   }
 
@@ -93,13 +106,13 @@ const mapStateToProps = (state) => {
     messages: state.chat.messages,
     currentMessage: state.chat.currentMessage,
   };
-};
+}
 
 const mapDispatchToProps = (dispatch) => {
   return {
     typingMessage: (_) => dispatch(typingMessage(_)),
     sendMessage: (_) => dispatch(sendMessage(_)),
   };
-};
+}
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Connected));

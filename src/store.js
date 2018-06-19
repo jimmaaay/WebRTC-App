@@ -2,7 +2,7 @@ import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk'
 
 import reducers from './reducers';
-import { joined } from './actions/connection';
+import { joined, disconnected } from './actions/connection';
 import { recievedMessage } from './actions/chat';
 
 
@@ -12,27 +12,52 @@ const store = createStore(
 );
 
 const addEventListeners = (dataChannel) => {
+
+  const removeEventListeners = () => {
+    dataChannel.removeEventListener('open', onOpen);
+    dataChannel.removeEventListener('message', onMessage);
+    dataChannel.removeEventListener('close', onClose);
+    dataChannel.removeEventListener('error', onError);
+    window.removeEventListener('beforeunload', onBrowserClose);
+
+    setupDataChannelListeners = false;
+  }
+
   const onOpen = () => {
     console.log('opened connection');
     store.dispatch(joined());
-  };
+  }
+
+  const onMessage = (e) => {
+    console.log(e);
+    store.dispatch(recievedMessage(JSON.parse(e.data)));
+  }
+
+  const onClose = (e) => {
+    console.log(e);
+    store.dispatch(disconnected());
+    removeEventListeners();
+  }
+
+  const onError = (e) => {
+    console.log(e);
+  }
+
+  const onBrowserClose = _ => dataChannel.close();
 
   if (dataChannel.readyState === 'open') onOpen();
-  dataChannel.onopen = onOpen;
+  else dataChannel.addEventListener('open', onOpen);
 
-  dataChannel.onmessage = (e) => {
-    store.dispatch(recievedMessage(JSON.parse(e.data)));
-  };
-
-  dataChannel.onclose = (e) => {
-    console.log(e);
-  };
-
-  dataChannel.onerror = (e) => {
-    console.log(e);
-  };
+  dataChannel.addEventListener('message', onMessage);
+  dataChannel.addEventListener('close', onClose);
+  dataChannel.addEventListener('error', onError);
   
-};
+  /**
+   * Sometimes the web rtc connection doesn't close when quitting the tab so this
+   * makes sure that the connection closes.
+   */
+  window.addEventListener('beforeunload', onBrowserClose);
+}
 
 let setupDataChannelListeners = false;
 
@@ -53,5 +78,7 @@ if (process.env.NODE_ENV !== 'production') {
     });
   }
 }
+
+window.store = store;
 
 export default store;

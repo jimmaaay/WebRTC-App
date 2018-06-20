@@ -9,6 +9,7 @@ import {
   CONNECTED,
   CONNECTION_INPUT_ERROR,
   CONNECTION_DISCONNECTED,
+  CONNECTION_EMULATOR,
 } from '../constants';
 
 const defaultState = {
@@ -20,6 +21,7 @@ const defaultState = {
   step: 0, // 0 or 1
   connectedTime: false,
   validationErrors: {}, // Keys will be page number that the error happened on
+  fakeConnection: false, // used to pretend there is a connection
 };
 
 const connection = (state = defaultState, action) => {
@@ -53,6 +55,9 @@ const connection = (state = defaultState, action) => {
 
     case CONNECTION_DISCONNECTED: 
       return { ...defaultState };
+
+    case CONNECTION_EMULATOR:
+      return { ...defaultState, fakeConnection: action.fakeConnection };
 
     default:
       return state;

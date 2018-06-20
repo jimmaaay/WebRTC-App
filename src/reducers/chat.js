@@ -37,6 +37,13 @@ const chat = (state = defaultState, action) => {
 
       const currentMessage = action.type === SENDING_MESSAGE ? '' : state.currentMessage;
 
+      if (action.fakeConnection === true) {
+        messages[Date.now()].push({
+          message: action.message.split('').reverse().join(''),
+          author: 'PERR',
+        });
+      }
+
       return { ...state, messages, currentMessage };
 
     case TYPING_MESSAGE:

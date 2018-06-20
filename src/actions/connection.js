@@ -8,6 +8,7 @@ import {
   CREATING,
   CONNECTION_INPUT_ERROR,
   CONNECTION_DISCONNECTED,
+  CONNECTION_EMULATOR,
 } from '../constants';
 
 import { config, connection as webConnection, errorHandler } from '../rooms/webrtc';
@@ -63,6 +64,13 @@ export const joined = () => {
 export const disconnected = () => {
   return {
     type: CONNECTION_DISCONNECTED,
+  };
+}
+
+export const emulateConnection = (fakeConnection) => {
+  return {
+    fakeConnection,
+    type: CONNECTION_EMULATOR,
   };
 }
 

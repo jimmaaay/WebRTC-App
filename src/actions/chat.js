@@ -6,13 +6,14 @@ import {
   TOGGLE_SENDING_NOTIFICATIONS,
 } from '../constants';
 
-const sendingMessage = ({message, timestamp}) => {
+const sendingMessage = ({message, timestamp}, fakeConnection) => {
   return {
     timestamp,
     message,
+    fakeConnection,
     type: SENDING_MESSAGE,
   };
-};
+}
 
 
 export const typingMessage = (message) => {
@@ -20,7 +21,7 @@ export const typingMessage = (message) => {
     message,
     type: TYPING_MESSAGE,
   };
-};
+}
 
 const recMessage = ({message, timestamp}) => {
   return {
@@ -40,18 +41,19 @@ export const recievedMessage = ({message, timestamp}) => {
     // console.log(chat);
     return Promise.resolve();
   }
-};
+}
 
 export const sendMessage = (message) => {
 
   return (dispatch, getState) => {
+    const { dataChannel, fakeConnection } = getState().connection;
     const obj = {
       message,
       timestamp: Date.now(),
     };
-    dispatch(sendingMessage(obj));
-    const { dataChannel } = getState().connection;
-    if (! dataChannel instanceof window.RTCDataChannel) {
+    dispatch(sendingMessage(obj, fakeConnection));
+    if (fakeConnection) return Promise.resolve();
+    if (! (dataChannel instanceof window.RTCDataChannel)) {
       console.log('ERROR HERE');
     }
 
@@ -60,7 +62,7 @@ export const sendMessage = (message) => {
     return Promise.resolve();
   };
 
-};
+}
 
 
 // auto, true or false
@@ -69,11 +71,11 @@ export const toggleNotifications = (value = 'auto') => {
     value,
     type: TOGGLE_NOTIFICATIONS,
   };
-};
+}
 
 export const toggleShowNotification = (value = 'auto') => {
   return {
     value,
     type: TOGGLE_SENDING_NOTIFICATIONS,
   };
-};
+}

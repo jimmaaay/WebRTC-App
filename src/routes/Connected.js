@@ -14,7 +14,10 @@ class Connected extends Component {
   }
 
   componentDidMount() {
-    const { history, dataChannel } = this.props;
+    const { history, dataChannel, fakeConnection } = this.props;
+
+    if (fakeConnection === true) return;
+    
     // Routes users back to the home page if a valid dataChannel is not present
     if (! (dataChannel instanceof window.RTCDataChannel)) {
       history.push('/');
@@ -23,7 +26,9 @@ class Connected extends Component {
   }
 
   componentDidUpdate() {
-    const { history, dataChannel } = this.props;
+    const { history, dataChannel, fakeConnection } = this.props;
+
+    if (fakeConnection === true) return;
 
     if (! (dataChannel instanceof window.RTCDataChannel)) {
       /*
@@ -105,6 +110,7 @@ const mapStateToProps = (state) => {
     dataChannel: state.connection.dataChannel,
     messages: state.chat.messages,
     currentMessage: state.chat.currentMessage,
+    fakeConnection: state.connection.fakeConnection,
   };
 }
 

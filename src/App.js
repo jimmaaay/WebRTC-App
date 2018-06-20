@@ -10,6 +10,7 @@ import BaseRoute from './routes/BaseRoute';
 import Create from './routes/Create';
 import Join from './routes/Join';
 import Connected from './routes/Connected';
+import { emulateConnection } from './actions/connection';
 import { toggleNotifications, toggleShowNotification } from './actions/chat';
 import './App.css';
 
@@ -26,7 +27,18 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { stage, history, toggleShowNotification } = this.props;
+    const {
+      stage,
+      history,
+      toggleShowNotification,
+      emulateConnection,
+    } = this.props;
+
+    if (document.location.search.indexOf('?emulateConnection') === 0) {
+      emulateConnection(true);
+      return history.push('/connected');
+    }
+
     if (stage === CONNECTED) {
       history.push('/connected');
     }
@@ -117,13 +129,14 @@ const mapStateToProps = (state) => {
     stage: state.connection.stage,
     sendNotifications: state.chat.sendNotifications,
   };
-};
+}
 
 const mapDispatchToProps = (dispatch) => {
   return {
     toggleNotifications: _ => dispatch(toggleNotifications(_)),
     toggleShowNotification: _ => dispatch(toggleShowNotification(_)),
+    emulateConnection: _ => dispatch(emulateConnection(_)),
   };
-};
+}
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

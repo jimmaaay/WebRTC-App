@@ -1,8 +1,8 @@
-.chat-window {
+.ChatWindow {
   color: #000;
 }
 
-.chat-window__text-box {
+.ChatWindowTextBox {
   height: calc(90vh - 16rem);
   margin-bottom: 2rem;
   background: #fff;
@@ -11,13 +11,13 @@
 }
 
 
-.chat-window__text-box ul {
+.ChatWindowTextBox ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.chat-window__item {
+.ChatWindowItem {
   display: inline-block;
   clear: both;
   border-radius: 0.5rem;
@@ -25,18 +25,18 @@
   padding: 0.25rem 0.5rem;
 }
 
-.chat-window__item--details {
+.ChatWindowItem--details {
   float: left;
   font-weight: 400;
   opacity: 0.5;
 }
 
-.chat-window__item--peer {
+.ChatWindowItem--peer {
   float: left;
   background: #efefef;
 }
 
-.chat-window__item--self {
+.ChatWindowItem--self {
   float: right;
   background: #6a00bb;
   color: #fff;
@@ -44,12 +44,12 @@
 }
 
 
-.chat-window__bottom {
+.ChatWindowBottom {
   display: flex;
   justify-content: space-between;
 }
 
 
-.chat-window__send {
+.ChatWindowSend {
   background: #efefef;
 }

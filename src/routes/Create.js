@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-// import Clipboard from 'clipboard';
 import { connect } from 'react-redux';
 import {
   initiateRTC,
@@ -7,6 +6,7 @@ import {
   changePeerOffer,
   inputError,
 } from '../actions/connection';
+import { Button } from '../components/Button/Button';
 import { CREATING } from '../constants';
 
 class Create extends Component {
@@ -65,7 +65,7 @@ class Create extends Component {
         <label>Send this to the person you want to connect to</label>
         <input type="text" value={hostOffer} id="offer" className={className} readOnly />
         { errorMessage }
-        <button onClick={this.sentOffer} className="button">Sent</button>
+        <Button onClick={this.sentOffer}>Sent</Button>
       </Fragment>
     )
     : (
@@ -73,7 +73,7 @@ class Create extends Component {
         <label>Please paste the response from the peer</label>
         <input type="text" value={peerOffer} onChange={this.peerResponseChange} className={className} />
         { errorMessage }
-        <button onClick={this.confirm} className="button">Confirm</button>
+        <Button onClick={this.confirm}>Confirm</Button>
       </Fragment>
     );
 

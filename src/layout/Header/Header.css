@@ -1,0 +1,67 @@
+
+.Header {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.HeaderTitle {
+  font-weight: 100;
+  letter-spacing: 0.1em;
+  font-size: 3rem;
+  margin: 0;
+}
+
+.HeaderTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.HeaderNotification {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent !important;
+  width: 4rem;
+  padding: 1rem;
+  line-height: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.HeaderNotification::before {
+  content: '';
+  display: block;
+  width: 2.5rem; 
+  height: 0.25rem;
+  background: #fff;
+  position: absolute;
+  top: 35%;
+  left: 61%;
+  transform-origin: left top;
+  margin-left: -1.25rem;
+  margin-top: -0.125rem;
+  transition: transform 0.5s ease-in-out;
+}
+
+.HeaderNotification {
+  opacity: 0.4;
+}
+
+.HeaderNotification::before {
+  transform: rotate(45deg);
+}
+
+.HeaderNotification:hover,
+.HeaderNotification:focus {
+  opacity: 1;
+}
+
+/* Having scaleX(0) in chrome 63 was making the animation not fire */
+.HeaderNotification.HeaderNotification--granted::before {
+  transform: rotate(45deg) scaleX(0.00001);
+}
+
+
+
+.HeaderNotification svg {
+  fill: #fff;
+}

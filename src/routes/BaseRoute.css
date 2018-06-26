@@ -1,4 +1,4 @@
-.base-route {
+.BaseRoute {
   display: flex;
   justify-content: space-between;
   max-width: 30rem;

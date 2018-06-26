@@ -7,6 +7,7 @@ import {
   changePeerOffer,
   inputError,
 } from '../actions/connection';
+import { Button } from '../components/Button/Button';
 import { sdpConstraints, errorHandler } from '../rooms/webrtc';
 import { JOINING } from '../constants';
 
@@ -77,7 +78,7 @@ class Join extends Component {
         <label>Paste the hosts offer</label>
         <input type="text" value={hostOffer} onChange={this.hostOfferChange} className={className} />
         { errorMessage }
-        <button onClick={this.confirmOffer} className="button">Confirm</button>
+        <Button onClick={this.confirmOffer}>Confirm</Button>
       </Fragment>
     )
     : (

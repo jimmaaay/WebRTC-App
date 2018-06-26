@@ -2,6 +2,7 @@ export const sdpConstraints = {
   optional: [],
 }
 
+// TODO: pull stunServers from npm module (can't remember the name) as it will get updated if any of these go down
 const stunServers = [
   'stun.l.google.com:19302',
   'stun1.l.google.com:19302',

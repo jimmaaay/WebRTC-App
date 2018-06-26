@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { typingMessage, sendMessage } from '../actions/chat';
-import ChatWindow from '../components/ChatWindow';
+import ChatWindow from '../components/ChatWindow/ChatWindow';
 
 class Connected extends Component {
 

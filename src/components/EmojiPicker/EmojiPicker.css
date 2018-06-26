@@ -1,8 +1,8 @@
-.emoji-picker {
+.EmojiPicker {
   position: relative;
 }
 
-.emoji-picker__popup {
+.EmojiPickerPopup {
   position: absolute;
   bottom: 100%;
   right: 0;
@@ -10,7 +10,7 @@
   background: #fff;
 }
 
-.emoji-picker__list {
+.EmojiPickerList {
   display: flex;
   flex-wrap: wrap;
   width: 20rem;
@@ -21,7 +21,7 @@
   overflow: auto;
 }
 
-.emoji-picker__list__title {
+.EmojiPickerListTitle {
   margin: 0;
   height: 3rem;
   display: flex;
@@ -29,13 +29,13 @@
   padding: 0 1.5rem;
 }
 
-.emoji-picker__list__item {
+.EmojiPickerListItem {
   display: block;
   width: 25%;
   float: left;
 }
 
-.emoji-picker__button {
+.EmojiPickerButton {
   margin: 0;
   background: #fff;
   height: 3rem;
@@ -48,14 +48,14 @@
 }
 
 
-.emoji-picker__button:hover,
-.emoji-picker__button:focus {
+.EmojiPickerButton:hover,
+.EmojiPickerButton:focus {
   background: #efefef;
 }
 
 
 
-.emoji-picker__categories {
+.EmojiPickerCategories {
   display: flex;
   list-style: none;
   justify-content: space-between;
@@ -63,14 +63,14 @@
   margin: 0;
 }
 
-.emoji-picker__category {
+.EmojiPickerCategory {
   flex-grow: 1;
   flex-basis: 0;
   line-height: 0;
   border-bottom: 3px solid transparent;
 }
 
-.emoji-picker__category__button {
+.EmojiPickerCategoryButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,16 +82,16 @@
   opacity: 0.7;
 }
 
-.emoji-picker__category__button:hover,
-.emoji-picker__category__button:focus {
+.EmojiPickerCategoryButton:hover,
+.EmojiPickerCategoryButton:focus {
   opacity: 0.9;
 }
 
-.emoji-picker__category__button img {
+.EmojiPickerCategoryButton img {
   width: 100%;
   display: block;
 }
 
-.emoji-picker__category--active {
+.EmojiPickerCategory--active {
   border-bottom-color: red;
 }

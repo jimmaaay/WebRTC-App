@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import EmojiPicker from './EmojiPicker';
-import './ChatWindow.css';
+import EmojiPicker from '../EmojiPicker/EmojiPicker';
+import styles from './ChatWindow.css';
+import { Button } from '../Button/Button';
 
 class ChatWindow extends Component {
 
@@ -19,18 +20,18 @@ class ChatWindow extends Component {
       const messageGroup = messages[timestamp];
       messageGroup.forEach(({ message: msg, author }, i) => {
         const key = `${timestamp}-${i}`;
-        let className = 'chat-window__item';
-        if (author === 'SELF') className += ' chat-window__item--self';
-        else className += ' chat-window__item--peer';
+        let className = styles.ChatWindowItem;
+        if (author === 'SELF') className += ` ${styles['ChatWindowItem--self']}`;
+        else className += ` ${styles['ChatWindowItem--peer']}`;
 
         array.push(
           <li key={key} className={className}>{msg}</li>
-        )
+        );
       });
     }
 
     array.unshift(
-      <li key="connected" className="chat-window__item chat-window__item--details">
+      <li key="connected" className={`${styles.ChatWindowItem} ${styles['ChatWindowItem--details']}`}>
         Connected -{ connectedTime }
       </li>
     );
@@ -70,12 +71,12 @@ class ChatWindow extends Component {
 
   render() {
     return (
-      <div className="chat-window">
-        <div className="chat-window__text-box" ref={(ref) => this.textBox = ref}>{this.chatBox()}</div>
-        <form onSubmit={this.props.sendMessage} className="chat-window__bottom">
+      <div className={styles.ChatWindow}>
+        <div className={styles.ChatWindowTextBox} ref={(ref) => this.textBox = ref}>{this.chatBox()}</div>
+        <form onSubmit={this.props.sendMessage} className={styles.ChatWindowBottom}>
           <input type="text" value={this.props.currentMessage} onChange={this.props.changeMessage} />
           <EmojiPicker pickedEmoji={this.pickedEmoji} />
-          <button type="submit" className="button chat-window__send">Send</button>
+          <Button type="submit" className={styles.ChatWindowSend}>Send</Button>
         </form>
       </div>
     )

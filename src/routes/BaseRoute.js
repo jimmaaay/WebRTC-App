@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import './BaseRoute.css';
+import { ButtonLink } from '../components/Button/Button';
+import styles from './BaseRoute.css';
 
 class BaseRoute extends Component {
 
   render() {
     return (
-      <div className="base-route">
-        <Link to="/create" className="button">Create</Link>
-        <Link to="/join" className="button">Join</Link>
+      <div className={styles.BaseRoute}>
+        <ButtonLink to="/create">Create</ButtonLink>
+        <ButtonLink to="/join">Join</ButtonLink>
       </div>
     );
   }

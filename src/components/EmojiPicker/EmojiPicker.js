@@ -2,24 +2,25 @@ import React, { Component } from 'react';
 import { lib as emojiLib } from 'emojilib';
 import { List } from 'react-virtualized';
 import { connect } from 'react-redux';
+import { Button } from '../Button/Button';
 import {
   toggleEmojiList,
   changeCurrentCatgeory,
   changeScrollTop,
-} from '../actions/emoji';
+} from '../../actions/emoji';
 import {
   thisOrParentMatches,
-} from '../helpers'
-import './EmojiPicker.css';
+} from '../../helpers'
+import styles from './EmojiPicker.css';
 
 // Icons sourced from https://material.io/tools/icons/?style=outline
-import airplane from '../icons/airplane.svg';
-import fastfood from '../icons/fastfood.svg';
-import flag from '../icons/flag.svg';
-import person from '../icons/person.svg';
-import pets from '../icons/pets.svg';
-import pool from '../icons/pool.svg';
-import watch from '../icons/watch.svg';
+import airplane from '../../icons/airplane.svg';
+import fastfood from '../../icons/fastfood.svg';
+import flag from '../../icons/flag.svg';
+import person from '../../icons/person.svg';
+import pets from '../../icons/pets.svg';
+import pool from '../../icons/pool.svg';
+import watch from '../../icons/watch.svg';
 
 const icons = {
   people: person,
@@ -143,13 +144,13 @@ class EmojiPicker extends Component {
         rowRenderer={({ index, key, style }) => {
           const row = rows[index];
           const items = typeof row === 'string' 
-          ? <p className="emoji-picker__list__title">{normaliseCategoryTitle(row)}</p>
+          ? <p className={styles.EmojiPickerListTitle}>{normaliseCategoryTitle(row)}</p>
           : row.map((item, i) => {
-            if (item == null) return <div key={i} className="emoji-picker__list__item" />;
+            if (item == null) return <div key={i} className={styles.EmojiPickerListItem} />;
             const { char } = item;
             return (
-              <div key={char} className="emoji-picker__list__item">
-                <button onClick={pickedEmoji(char)} type="button" className="emoji-picker__button">
+              <div key={char} className={styles.EmojiPickerListItem}>
+                <button onClick={pickedEmoji(char)} type="button" className={styles.EmojiPickerButton}>
                   {char}
                 </button>
               </div>
@@ -167,7 +168,7 @@ class EmojiPicker extends Component {
   }
 
   categoryButtonClick({ target }) {
-    const button = thisOrParentMatches(target, '.emoji-picker__category__button');
+    const button = thisOrParentMatches(target, `.${styles.EmojiPickerCategoryButton}`);
     if (button === false) return;
     const { changeScrollTop } = this.props;
     const category = button.getAttribute('data-category');
@@ -181,22 +182,21 @@ class EmojiPicker extends Component {
     const { currentCategory } = this.props;
 
     return (
-      <div className="emoji-picker__popup">
-        <ul className="emoji-picker__categories">
+      <div className={styles.EmojiPickerPopup}>
+        <ul className={styles.EmojiPickerCategories}>
           { emojiCategories.map((category) => {
             const className = currentCategory === category
-            ? 'emoji-picker__category emoji-picker__category--active'
-            : 'emoji-picker__category';
+            ? `${styles.EmojiPickerCategory} ${styles['EmojiPickerCategory--active']}`
+            : styles.EmojiPickerCategory;
 
             const icon = icons.hasOwnProperty(category)
-            ? <img src={icons[category]} />
+            ? <img src={icons[category]} alt={category} />
             : category.slice(0, 1);
 
-            // TODO: add icons for the known categories
             return (
               <li key={category} className={className}>
                 <button 
-                  className="emoji-picker__category__button" 
+                  className={styles.EmojiPickerCategoryButton} 
                   type="button"
                   onClick={this.categoryButtonClick}
                   data-category={category}>
@@ -206,7 +206,7 @@ class EmojiPicker extends Component {
             );
           }) }
         </ul>
-        <div className="emoji-picker__list">
+        <div className={styles.EmojiPickerList}>
           { this.getEmojiItems() }
         </div >
       </div>
@@ -215,8 +215,8 @@ class EmojiPicker extends Component {
 
   render() {
     return (
-      <div className="emoji-picker">
-        <button type="button" className="button" onClick={this.props.toggleEmojiList}>Emojis</button>
+      <div className={styles.EmojiPicker}>
+        <Button type="button" onClick={this.props.toggleEmojiList}>Emojis</Button>
         { this.props.emoji.open ? this.returnList() : null }
       </div>
     );

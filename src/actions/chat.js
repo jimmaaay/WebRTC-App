@@ -64,6 +64,13 @@ export const sendMessage = (message) => {
 
 }
 
+export const sendFile = (file) => {
+  return (dispatch, getState) => {
+    const { dataChannel } = getState().connection;
+    
+  }
+}
+
 
 // auto, true or false
 export const toggleNotifications = (value = 'auto') => {

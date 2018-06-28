@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   Route,
-  Link,
   withRouter,
 } from 'react-router-dom';
 import { CONNECTED } from './constants';
@@ -15,6 +14,12 @@ import { emulateConnection } from './actions/connection';
 import { toggleNotifications, toggleShowNotification } from './actions/chat';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.handleDrop = this.handleDrop.bind(this);
+    this.preventDefault = this.preventDefault.bind(this);
+  }
 
   componentDidMount() {
     const {
@@ -42,10 +47,23 @@ class App extends Component {
     }
   }
 
-  render() {
+  handleDrop(e) {
+    if (this.props.stage !== CONNECTED) return;
+    e.preventDefault();
+    const { dataTransfer } = e;
+    const { files } = dataTransfer;
+    console.log(files);
+  }
 
+  preventDefault(e) {
+    if (this.props.stage !== CONNECTED) return;
+    e.preventDefault();
+  }
+
+  render() {
+    // Have to preventDefault onDragOver for onDrop to work
     return (
-      <div>
+      <div onDrop={this.handleDrop} onDragOver={this.preventDefault}>
         <Header />
         <main>
           <Route exact path="/" component={BaseRoute} />

@@ -57,7 +57,7 @@ const connection = (state = defaultState, action) => {
       return { ...defaultState };
 
     case CONNECTION_EMULATOR:
-      return { ...defaultState, fakeConnection: action.fakeConnection };
+      return { ...defaultState, fakeConnection: action.fakeConnection, stage: CONNECTED };
 
     default:
       return state;

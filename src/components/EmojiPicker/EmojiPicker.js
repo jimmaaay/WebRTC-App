@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { lib as emojiLib } from 'emojilib';
 import { List } from 'react-virtualized';
 import { connect } from 'react-redux';
@@ -214,11 +214,18 @@ class EmojiPicker extends Component {
   }
 
   render() {
+    const overlayProps = {
+      className: styles.EmojiPickerOverlay,
+      onClick: this.props.toggleEmojiList,
+    };
     return (
-      <div className={styles.EmojiPicker}>
-        <Button type="button" onClick={this.props.toggleEmojiList}>Emojis</Button>
-        { this.props.emoji.open ? this.returnList() : null }
-      </div>
+      <Fragment>
+        <div className={styles.EmojiPicker}>
+          <Button type="button" onClick={this.props.toggleEmojiList}>Emojis</Button>
+          { this.props.emoji.open ? this.returnList() : null }
+        </div>
+        { this.props.emoji.open ? <div {...overlayProps} /> : null }
+      </Fragment>
     );
   }
 

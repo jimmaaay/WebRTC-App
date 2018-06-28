@@ -37,8 +37,12 @@ const chat = (state = defaultState, action) => {
 
       const currentMessage = action.type === SENDING_MESSAGE ? '' : state.currentMessage;
 
+
+      // Adds a fake response ( usedful for dev )
       if (action.fakeConnection === true) {
-        messages[Date.now()].push({
+        const now = Date.now();
+        if (! messages.hasOwnProperty(now)) messages[now] = [];
+        messages[now].push({
           message: action.message.split('').reverse().join(''),
           author: 'PERR',
         });

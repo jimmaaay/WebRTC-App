@@ -25,3 +25,6 @@ export const EMOJI_CHANGE_SCROLL_TOP = 'EMOJI_CHANGE_SCROLL_TOP';
 
 export const TOGGLE_NOTIFICATIONS = 'TOGGLE_NOTIFICATIONS';
 export const TOGGLE_SENDING_NOTIFICATIONS = 'TOGGLE_SENDING_NOTIFICATIONS';
+
+ // 16kb. Not particularly sure why this is recommended as the max size
+export const MAX_CHUNK_SIZE = 16384;

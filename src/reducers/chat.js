@@ -5,6 +5,7 @@ import {
   TOGGLE_NOTIFICATIONS,
   TOGGLE_SENDING_NOTIFICATIONS,
   CONNECTION_DISCONNECTED,
+  SENDING_FILE,
 } from '../constants';
 
 const defaultState = {
@@ -24,7 +25,7 @@ const chat = (state = defaultState, action) => {
   switch (action.type) {
 
     case RECIEVED_MESSAGE:
-    case SENDING_MESSAGE:
+    case SENDING_MESSAGE: {
       const messages = { ...state.messages };
       if (! messages.hasOwnProperty(action.timestamp)) {
         messages[action.timestamp] = [];
@@ -44,11 +45,26 @@ const chat = (state = defaultState, action) => {
         if (! messages.hasOwnProperty(now)) messages[now] = [];
         messages[now].push({
           message: action.message.split('').reverse().join(''),
-          author: 'PERR',
+          author: 'PEER',
         });
       }
 
       return { ...state, messages, currentMessage };
+
+    }
+
+    case SENDING_FILE: {
+      const messages = { ...state.messages };
+      if (! messages.hasOwnProperty(action.timestamp)) {
+        messages[action.timestamp] = [];
+      }
+      messages[action.timestamp].push({
+        message: 'FILE',
+        author: 'SELF',
+      });
+
+      return { ...state, messages };
+    }
 
     case TYPING_MESSAGE:
       return { ...state, currentMessage: action.message };

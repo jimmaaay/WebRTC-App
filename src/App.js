@@ -11,7 +11,11 @@ import Create from './routes/Create';
 import Join from './routes/Join';
 import Connected from './routes/Connected';
 import { emulateConnection } from './actions/connection';
-import { toggleNotifications, toggleShowNotification } from './actions/chat';
+import { 
+  toggleNotifications,
+  toggleShowNotification,
+  sendFile,
+} from './actions/chat';
 
 class App extends Component {
 
@@ -53,6 +57,8 @@ class App extends Component {
     const { dataTransfer } = e;
     const { files } = dataTransfer;
     console.log(files);
+
+    Array.from(files).forEach(file => this.props.sendFile(file));
   }
 
   preventDefault(e) {
@@ -89,6 +95,7 @@ const mapDispatchToProps = (dispatch) => {
     toggleNotifications: _ => dispatch(toggleNotifications(_)),
     toggleShowNotification: _ => dispatch(toggleShowNotification(_)),
     emulateConnection: _ => dispatch(emulateConnection(_)),
+    sendFile: _ => dispatch(sendFile(_)),
   };
 }
 

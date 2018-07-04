@@ -80,6 +80,7 @@ const sendingFile = (file, fakeConnection) => {
   };
 }
 
+// TODO: should probably request permission to send files from other peer first
 export const sendFile = (file) => {
   return (dispatch, getState) => {
     const { dataChannel, fakeConnection } = getState().connection;
@@ -90,51 +91,50 @@ export const sendFile = (file) => {
     }
 
     const fileID = Date.now(); // generate this some other way?
-    // const arrayBuffer = convertObjectToArrayBuffer({ fileID });
-    // const parsedMessage = arrayBufferToObject(arrayBuffer);
-    // console.log(arrayBuffer, parsedMessage);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const { result } = e.target;
-      const { byteLength } = result;
-      const requestHeaders = {
-        byteLength,
+    const requestHeaders = {
         fileID,
         type: 'FILE',
+        size: file.size,
       };
-      const header = new Uint8Array(convertObjectToArrayBuffer(requestHeaders));
-      const headerSize = header.byteLength;
 
-      // First element in the buffer is the headerSize
-      const maxDataSize = MAX_CHUNK_SIZE - headerSize - 1;
-      const data = new Uint8Array(result);
+    const reader = new FileReader();
+    const header = new Uint8Array(convertObjectToArrayBuffer(requestHeaders));
+    const headerSize = header.byteLength;
+    const maxDataSize = MAX_CHUNK_SIZE - headerSize - 1;
 
-      for (let i = 0; i < byteLength / maxDataSize; i++) {
-        const start = maxDataSize * i;
-        const maxEnd = byteLength - start;
+    const send = (file, header, maxDataSize, chunk, dataChannel, cb) => {
+      const start = maxDataSize * chunk;
+      const maxEnd = file.size - start;
 
-        const messageSize = maxEnd <= maxDataSize
-        ? maxEnd + headerSize + 1
-        : maxDataSize + headerSize + 1;
+      const messageSize = maxEnd <= maxDataSize
+      ? maxEnd + headerSize + 1
+      : maxDataSize + headerSize + 1;
 
-        const end = maxEnd <= maxDataSize
-        ? byteLength
-        : start + maxDataSize;
+      const end = maxEnd <= maxDataSize
+      ? file.size
+      : start + maxDataSize;
 
+      reader.onload = (e) => {
         const toSend = new Uint8Array(messageSize);
-        toSend[0] = headerSize;
+        const data = new Uint8Array(e.target.result);
+        toSend[0] = header.byteLength;
         arrayBufferConcat(toSend, header, 1);
-        arrayBufferConcat(toSend, data.slice(start, end), 1 + headerSize);
+        arrayBufferConcat(toSend, data, 1 + headerSize);
+        
+        dataChannel.send(toSend);
+        if (end === file.size) return cb();
 
-        dataChannel.send(toSend.buffer);
+        // TODO: maybe add a timeout to throttle sending data?
+        send(file, header, maxDataSize, ++chunk, dataChannel, cb);
       }
+
+      reader.readAsArrayBuffer(file.slice(start, end));
     }
 
-    reader.readAsArrayBuffer(file);
+    send(file, header, maxDataSize, 0, dataChannel, () => {
+      console.log('sent file');
+    });
 
-
-    // dataChannel.send(file);
     return Promise.resolve();
   }
 }

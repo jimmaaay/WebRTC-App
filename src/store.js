@@ -4,6 +4,7 @@ import ReduxThunk from 'redux-thunk'
 import reducers from './reducers';
 import { joined, disconnected } from './actions/connection';
 import { recievedMessage } from './actions/chat';
+import { arrayBufferToObject } from './helpers';
 
 
 const store = createStore(
@@ -29,8 +30,19 @@ const addEventListeners = (dataChannel) => {
   }
 
   const onMessage = (e) => {
-    console.log(e);
-    store.dispatch(recievedMessage(JSON.parse(e.data)));
+    console.log(e, typeof e.data);
+    if (typeof e.data === 'string') {
+      store.dispatch(recievedMessage(JSON.parse(e.data)));
+    } else {
+      const fullResponse = new Uint8Array(e.data);
+      const headerSize = fullResponse[0]; // first item lists header size
+      const headerArrayBuffer = fullResponse.slice(1, headerSize + 1); // header data
+      const headerData = arrayBufferToObject(headerArrayBuffer); // converts the header data to an object
+
+      console.log(headerData);
+
+
+    }
   }
 
   const onClose = (e) => {

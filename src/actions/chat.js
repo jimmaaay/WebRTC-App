@@ -93,18 +93,18 @@ export const sendFile = (file) => {
     // const arrayBuffer = convertObjectToArrayBuffer({ fileID });
     // const parsedMessage = arrayBufferToObject(arrayBuffer);
     // console.log(arrayBuffer, parsedMessage);
-    const requestHeaders = {
-      fileID,
-      type: 'FILE',
-    };
-
-    const header = new Uint8Array(convertObjectToArrayBuffer(requestHeaders));
-    const headerSize = header.byteLength;
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const { result } = e.target;
       const { byteLength } = result;
+      const requestHeaders = {
+        byteLength,
+        fileID,
+        type: 'FILE',
+      };
+      const header = new Uint8Array(convertObjectToArrayBuffer(requestHeaders));
+      const headerSize = header.byteLength;
 
       // First element in the buffer is the headerSize
       const maxDataSize = MAX_CHUNK_SIZE - headerSize - 1;

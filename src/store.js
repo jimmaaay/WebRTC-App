@@ -1,11 +1,13 @@
 import { createStore, applyMiddleware } from 'redux';
-import ReduxThunk from 'redux-thunk'
+import ReduxThunk from 'redux-thunk';
+import streamsaver, { createWriteStream } from 'streamsaver';
 
 import reducers from './reducers';
 import { joined, disconnected } from './actions/connection';
 import { recievedMessage } from './actions/chat';
 import { arrayBufferToObject } from './helpers';
 
+streamsaver.mitm = 'https://webrtc-streamsaver.jimmythompson.me/mitm.html';
 
 const store = createStore(
   reducers,
@@ -29,6 +31,8 @@ const addEventListeners = (dataChannel) => {
     store.dispatch(joined());
   }
 
+  const fileStreams = {};
+
   const onMessage = (e) => {
     console.log(e, typeof e.data);
     if (typeof e.data === 'string') {
@@ -38,9 +42,32 @@ const addEventListeners = (dataChannel) => {
       const headerSize = fullResponse[0]; // first item lists header size
       const headerArrayBuffer = fullResponse.slice(1, headerSize + 1); // header data
       const headerData = arrayBufferToObject(headerArrayBuffer); // converts the header data to an object
+      const { name, fileID, size } = headerData;
+      const fileData = fullResponse.slice(headerSize + 1);
+      console.log(fileData);
+      const key = name + fileID;
+      
+      if (! fileStreams.hasOwnProperty(key)) {
+        fileStreams[key] = {
+          bytesSaved: 0,
+          writer: createWriteStream(name, size).getWriter(),
+        };
+      }
 
-      console.log(headerData);
+      const file = fileStreams[key];
+      
+      const { writer } = file
+      file.bytesSaved = file.bytesSaved + fileData.byteLength;
 
+      writer.write(fileData);
+
+      // console.
+
+      if (file.bytesSaved === size) {
+        console.log('saved file??');
+        writer.close();
+        delete fileStreams[key];
+      }
 
     }
   }
@@ -55,7 +82,10 @@ const addEventListeners = (dataChannel) => {
     console.log(e);
   }
 
-  const onBrowserClose = _ => dataChannel.close();
+  const onBrowserClose = e => {
+    console.log(e);
+    // dataChannel.close(); // this is causing issues with streamSaver. Maybe when it has to open the iframe?
+  }
 
   if (dataChannel.readyState === 'open') onOpen();
   else dataChannel.addEventListener('open', onOpen);

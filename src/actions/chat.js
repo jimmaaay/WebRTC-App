@@ -92,15 +92,18 @@ export const sendFile = (file) => {
 
     const fileID = Date.now(); // generate this some other way?
     const requestHeaders = {
-        fileID,
-        type: 'FILE',
-        size: file.size,
-      };
+      fileID,
+      type: 'FILE',
+      size: file.size,
+      name: file.name,
+    };
 
     const reader = new FileReader();
     const header = new Uint8Array(convertObjectToArrayBuffer(requestHeaders));
     const headerSize = header.byteLength;
     const maxDataSize = MAX_CHUNK_SIZE - headerSize - 1;
+
+    let dataSize = 0;
 
     const send = (file, header, maxDataSize, chunk, dataChannel, cb) => {
       const start = maxDataSize * chunk;
@@ -120,18 +123,26 @@ export const sendFile = (file) => {
         toSend[0] = header.byteLength;
         arrayBufferConcat(toSend, header, 1);
         arrayBufferConcat(toSend, data, 1 + headerSize);
+
+        console.log(toSend);
         
         dataChannel.send(toSend);
         if (end === file.size) return cb();
 
         // TODO: maybe add a timeout to throttle sending data?
-        send(file, header, maxDataSize, ++chunk, dataChannel, cb);
+        setTimeout(() => {
+          send(file, header, maxDataSize, ++chunk, dataChannel, cb);
+        }, 0);
+
       }
+
+      dataSize = dataSize + end - start;
 
       reader.readAsArrayBuffer(file.slice(start, end));
     }
 
     send(file, header, maxDataSize, 0, dataChannel, () => {
+      console.log(dataSize, file);
       console.log('sent file');
     });
 

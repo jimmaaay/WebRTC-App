@@ -31,4 +31,5 @@ if (module.hot) {
     );
   });
 }
-registerServiceWorker();
+
+// registerServiceWorker();

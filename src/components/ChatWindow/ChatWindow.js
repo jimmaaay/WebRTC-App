@@ -3,6 +3,8 @@ import EmojiPicker from '../EmojiPicker/EmojiPicker';
 import styles from './ChatWindow.css';
 import { Button } from '../Button/Button';
 
+const root = document.documentElement;
+
 class ChatWindow extends Component {
 
   constructor(props) {
@@ -41,6 +43,10 @@ class ChatWindow extends Component {
         { array }
       </ul>
     );
+  }
+
+  componentWillUnmount() {
+    root.classList.remove('drag-over');
   }
 
   componentDidUpdate(prevProps) {

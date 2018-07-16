@@ -16,13 +16,17 @@ import {
   toggleShowNotification,
   sendFile,
 } from './actions/chat';
+import styles from './App.css';
+
+const root = document.documentElement;
 
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.handleDrop = this.handleDrop.bind(this);
-    this.preventDefault = this.preventDefault.bind(this);
+    this.dragOver = this.dragOver.bind(this);
+    this.dragLeave = this.dragLeave.bind(this);
   }
 
   componentDidMount() {
@@ -43,6 +47,17 @@ class App extends Component {
  
   }
 
+  dragOver(e) {
+    if (this.props.stage !== CONNECTED) return;
+    e.preventDefault();
+    root.classList.add(styles.dragOver);
+  }
+
+  dragLeave(e) {
+    if (this.props.stage !== CONNECTED) return;
+    root.classList.remove(styles.dragOver);
+  }
+
   componentWillReceiveProps(nextProps) {
     const { history, stage:oldStage } = this.props;
     const { stage } = nextProps;
@@ -56,20 +71,20 @@ class App extends Component {
     e.preventDefault();
     const { dataTransfer } = e;
     const { files } = dataTransfer;
-    console.log(files);
 
     Array.from(files).forEach(file => this.props.sendFile(file));
+    root.classList.remove(styles.dragOver);
   }
 
-  preventDefault(e) {
-    if (this.props.stage !== CONNECTED) return;
-    e.preventDefault();
-  }
 
   render() {
     // Have to preventDefault onDragOver for onDrop to work
     return (
-      <div onDrop={this.handleDrop} onDragOver={this.preventDefault}>
+      <div 
+        onDrop={this.handleDrop} 
+        onDragOver={this.dragOver}
+        onDragLeave={this.dragLeave}
+      >
         <Header />
         <main>
           <Route exact path="/" component={BaseRoute} />

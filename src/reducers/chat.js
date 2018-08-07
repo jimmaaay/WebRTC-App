@@ -66,24 +66,30 @@ const chat = (state = defaultState, action) => {
       return { ...state, messages };
     }
 
-    case TYPING_MESSAGE:
+    case TYPING_MESSAGE: {
       return { ...state, currentMessage: action.message };
+    }
 
-    case TOGGLE_NOTIFICATIONS:
+    case TOGGLE_NOTIFICATIONS: {
       const sendNotifications = action.value === 'auto' ? !state.sendNotifications : action.value;
       const sBSN = sendNotifications === false ? false : state.shouldBeSendingNotifications; 
       return { ...state, sendNotifications, shouldBeSendingNotifications: sBSN };
+    }
 
-    case TOGGLE_SENDING_NOTIFICATIONS:
+    case TOGGLE_SENDING_NOTIFICATIONS: {
       const shouldBeSendingNotifications = action.value === 'auto' ? !state.shouldBeSendingNotifications : action.value;
       return { ...state, shouldBeSendingNotifications };
+    }
 
 
-    case CONNECTION_DISCONNECTED:
+    case CONNECTION_DISCONNECTED: {
       return { ...defaultState };
+    }
 
-    default:
+    default: {
       return state;
+    }
+    
   }
 
 }

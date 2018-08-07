@@ -1,15 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import {
-  initiateRTC,
   changeHostOffer,
   nextStep,
   changePeerOffer,
   inputError,
 } from '../actions/connection';
 import { Button } from '../components/Button/Button';
-import { sdpConstraints, errorHandler } from '../rooms/webrtc';
-import { JOINING } from '../constants';
+import { newConnection } from '../actions/connection';
 
 class Join extends Component {
   constructor(props) {
@@ -20,7 +18,7 @@ class Join extends Component {
   }
 
   componentDidMount() {
-    this.props.initiateRTC(JOINING);
+    this.props.newConnection();
   }
 
   hostOfferChange({target}) {
@@ -28,49 +26,36 @@ class Join extends Component {
   }
 
   confirmOffer(e) {
-    const { computer, hostOffer } = this.props.connection;
-    let obj;
-    try {
-      obj = JSON.parse(atob(hostOffer));
-    } catch(e) {
-      console.log(e);
-      obj = false;
-    }
+    const {
+      hostOffer,
+      webrtcConnection,
+      changePeerOffer,
+      nextStep,
+      inputError
+    } = this.props;
+    
+    webrtcConnection.joinRoom(hostOffer)
+      .then((responseOffer) => {
+        changePeerOffer(responseOffer);
+        nextStep();
+      })
+      .catch(() => {
+        inputError('Host offer is not valid');
+      });
 
-    if (obj !== false) {
-      const offer = new RTCSessionDescription(obj);
-      computer
-        .setRemoteDescription(offer)
-        .then(() => {
-          computer
-          .createAnswer(sdpConstraints)
-          .then(answerDesc => computer.setLocalDescription(answerDesc))
-          .catch(errorHandler);
-
-          computer.onicecandidate = (e) => {
-            if (e.candidate != null) return;
-            this.props.changePeerOffer(btoa(JSON.stringify(computer.localDescription)));
-          };
-
-          this.props.nextStep();
-        })
-        .catch((e) => {
-          console.log(e);
-          this.props.inputError('Host offer is not valid');
-        });
-
-
-    } else this.props.inputError('Host offer is not valid');
 
   }
 
   render() {
     const { step, hostOffer, peerOffer, validationErrors } = this.props.connection;
+    const { webrtcConnection } = this.props;
     const hasErrorMessage = validationErrors.hasOwnProperty(step);
     const className = hasErrorMessage ? 'input-error' : '';
     const errorMessage = hasErrorMessage
     ? (<p className="error-message">{validationErrors[step]}</p>)
     : null;
+
+    const confirmDisabled = webrtcConnection === false;
 
     const content = step === 0
     ? (
@@ -78,7 +63,7 @@ class Join extends Component {
         <label>Paste the hosts offer</label>
         <input type="text" value={hostOffer} onChange={this.hostOfferChange} className={className} />
         { errorMessage }
-        <Button onClick={this.confirmOffer}>Confirm</Button>
+        <Button onClick={this.confirmOffer} disabled={confirmDisabled}>Confirm</Button>
       </Fragment>
     )
     : (
@@ -97,19 +82,26 @@ class Join extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ connection }) => {
+  const {
+    webrtcConnection,
+    hostOffer,
+  } = connection;
+
   return {
-    connection: state.connection,
+    connection,
+    webrtcConnection,
+    hostOffer,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    initiateRTC: _ => dispatch(initiateRTC(_)),
     changeHostOffer: _ => dispatch(changeHostOffer(_)),
     nextStep: _ => dispatch(nextStep()),
     changePeerOffer: _ => dispatch(changePeerOffer(_)),
     inputError: _ => dispatch(inputError(_)),
+    newConnection: _ => dispatch(newConnection()),
   }
 };
 

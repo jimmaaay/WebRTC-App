@@ -13,32 +13,35 @@ class Connected extends Component {
     this.sendMessage = this.sendMessage.bind(this);
   }
 
-  componentDidMount() {
-    const { history, dataChannel, fakeConnection } = this.props;
+  // TODO: reenable the checks if peers are connected
+  
 
-    if (fakeConnection === true) return;
+  // componentDidMount() {
+  //   const { history, dataChannel, fakeConnection } = this.props;
+
+  //   if (fakeConnection === true) return;
     
-    // Routes users back to the home page if a valid dataChannel is not present
-    if (! (dataChannel instanceof window.RTCDataChannel)) {
-      history.push('/');
-    }
+  //   // Routes users back to the home page if a valid dataChannel is not present
+  //   if (! (dataChannel instanceof window.RTCDataChannel)) {
+  //     history.push('/');
+  //   }
 
-  }
+  // }
 
-  componentDidUpdate() {
-    const { history, dataChannel, fakeConnection } = this.props;
+  // componentDidUpdate() {
+  //   const { history, dataChannel, fakeConnection } = this.props;
 
-    if (fakeConnection === true) return;
+  //   if (fakeConnection === true) return;
 
-    if (! (dataChannel instanceof window.RTCDataChannel)) {
-      /*
-       *  TODO: don't redirect user back to home. Display a message which says chat is disconnected
-       *  and don't let them type anything in the chat box
-       */
-      history.push('/');
-    }
+  //   if (! (dataChannel instanceof window.RTCDataChannel)) {
+  //     /*
+  //      *  TODO: don't redirect user back to home. Display a message which says chat is disconnected
+  //      *  and don't let them type anything in the chat box
+  //      */
+  //     history.push('/');
+  //   }
 
-  }
+  // }
 
   chatBox() {
     const { connectedTime, messages } = this.props;

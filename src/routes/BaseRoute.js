@@ -17,5 +17,4 @@ class BaseRoute extends Component {
 
 
 
-
 export default BaseRoute;

@@ -1,13 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import {
-  initiateRTC,
   nextStep,
   changePeerOffer,
+  changeHostOffer,
   inputError,
 } from '../actions/connection';
 import { Button } from '../components/Button/Button';
-import { CREATING } from '../constants';
+import { newConnection } from '../actions/connection';
 
 class Create extends Component {
   constructor(props) {
@@ -19,7 +19,22 @@ class Create extends Component {
   }
 
   componentDidMount() {
-    this.props.initiateRTC(CREATING);
+    this.finishCreatingRoom = false;
+    this.props.newConnection();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { webrtcConnection } = this.props;
+    const prevWebrtcConnection = prevProps.webrtcConnection;
+
+    if (! (prevWebrtcConnection === false && webrtcConnection !== false)) return;
+
+    webrtcConnection.createRoom()
+      .then(({ offer, finishCreatingRoom }) => {
+        this.props.changeHostOffer(offer);
+        this.finishCreatingRoom = finishCreatingRoom; // save to be used later
+      });
+
   }
 
   peerResponseChange({target}) {
@@ -31,28 +46,19 @@ class Create extends Component {
   }
 
   confirm() {
-    const { peerOffer, computer } = this.props.connection;
-    let obj;
-    try {
-      obj = JSON.parse(atob(peerOffer))
-    } catch(e) {
-      console.log(e);
-      obj = false;
+    const { peerOffer, inputError } = this.props;
+    if (this.finishCreatingRoom === false) {
+      throw new Error('Cannot finish creating connection');
     }
-
-    if (obj !== false) {
-      const answer = new RTCSessionDescription(obj);
-      computer.setRemoteDescription(answer)
-        .catch((e) => {
-          console.log(e);
-          this.props.inputError('Peer offer is not valid');
-        });
-    } else this.props.inputError('Peer offer is not valid');
-
+    try {
+      this.finishCreatingRoom(peerOffer); // TODO: should this be caught by the lib?
+    } catch(e) {
+      inputError('Peer offer is not valid');
+    }
   }
 
   render() {
-    const { hostOffer, step, peerOffer, validationErrors } = this.props.connection;
+    const { hostOffer, peerOffer, step, validationErrors } = this.props;
     const hasErrorMessage = validationErrors.hasOwnProperty(step);
     const className = hasErrorMessage ? 'input-error' : '';
     const errorMessage = hasErrorMessage
@@ -85,18 +91,32 @@ class Create extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ connection }) => {
+  const { 
+    webrtcConnection,
+    peerOffer,
+    hostOffer,
+    step,
+    validationErrors,
+  } = connection;
+
   return {
-    connection: state.connection,
+    webrtcConnection,
+    peerOffer,
+    hostOffer,
+    step,
+    validationErrors,
   };
+
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    initiateRTC: _ => dispatch(initiateRTC(_)),
     nextStep: _ => dispatch(nextStep()),
     changePeerOffer: _ => dispatch(changePeerOffer(_)),
     inputError: _ => dispatch(inputError(_)),
+    newConnection: _ => dispatch(newConnection()),
+    changeHostOffer: _ => dispatch(changeHostOffer(_)),
   };
 };
 

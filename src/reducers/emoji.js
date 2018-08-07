@@ -33,9 +33,9 @@ const emoji = (state = defaultState, action) => {
       return { ...defaultState };
     }
 
-
-    default:
+    default: {
       return state;
+    }
 
   }
 

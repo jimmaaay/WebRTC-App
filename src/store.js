@@ -1,11 +1,11 @@
 import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk';
+// import SimpleWebRTCWrapper from 'simple-webrtc-wrapper';
 import streamsaver, { createWriteStream } from 'streamsaver';
 
 import reducers from './reducers';
 import { joined, disconnected } from './actions/connection';
 import { recievedMessage } from './actions/chat';
-import { arrayBufferToObject } from './helpers';
 
 streamsaver.mitm = 'https://webrtc-streamsaver.jimmythompson.me/mitm.html';
 
@@ -14,102 +14,54 @@ const store = createStore(
   applyMiddleware(ReduxThunk)
 );
 
-const addEventListeners = (dataChannel) => {
-
-  const removeEventListeners = () => {
-    dataChannel.removeEventListener('open', onOpen);
-    dataChannel.removeEventListener('message', onMessage);
-    dataChannel.removeEventListener('close', onClose);
-    dataChannel.removeEventListener('error', onError);
-    window.removeEventListener('beforeunload', onBrowserClose);
-
-    setupDataChannelListeners = false;
-  }
-
-  const onOpen = () => {
-    console.log('opened connection');
-    store.dispatch(joined());
-  }
+const addEventListeners = (connection) => {
 
   const fileStreams = {};
-
-  const onMessage = (e) => {
-    console.log(e, typeof e.data);
-    if (typeof e.data === 'string') {
-      store.dispatch(recievedMessage(JSON.parse(e.data)));
-    } else {
-      const fullResponse = new Uint8Array(e.data);
-      const headerSize = fullResponse[0]; // first item lists header size
-      const headerArrayBuffer = fullResponse.slice(1, headerSize + 1); // header data
-      const headerData = arrayBufferToObject(headerArrayBuffer); // converts the header data to an object
-      const { name, fileID, size } = headerData;
-      const fileData = fullResponse.slice(headerSize + 1);
-      console.log(fileData);
-      const key = name + fileID;
-      
-      if (! fileStreams.hasOwnProperty(key)) {
-        fileStreams[key] = {
+  
+  connection
+    .on('connected', () => {
+      store.dispatch(joined());
+    })
+    .on('connection-closed', () => {
+      store.dispatch(disconnected());
+    })
+    .on('message', ({ message, timestamp }) => {
+      store.dispatch(recievedMessage({
+        message,
+        timestamp
+      }));
+    })
+    .on('error', console.log)
+    // TODO: try seeing what breaks streamsaver on chrome 70
+    .on('fileChunk', ({ name, id, size, chunk }) => {
+      if (! fileStreams.hasOwnProperty(id)) {
+        fileStreams[id] = {
           bytesSaved: 0,
           writer: createWriteStream(name, size).getWriter(),
         };
       }
+      const file = fileStreams[id];
 
-      const file = fileStreams[key];
-      
-      const { writer } = file
-      file.bytesSaved = file.bytesSaved + fileData.byteLength;
-
-      writer.write(fileData);
-
-      // console.
+      file.bytesSaved = file.bytesSaved + chunk.byteLength;
+      file.writer.write(chunk);
 
       if (file.bytesSaved === size) {
-        console.log('saved file??');
-        writer.close();
-        delete fileStreams[key];
+        file.writer.close();
+        delete fileStreams[id];
       }
 
-    }
-  }
+    });
 
-  const onClose = (e) => {
-    console.log(e);
-    store.dispatch(disconnected());
-    removeEventListeners();
-  }
-
-  const onError = (e) => {
-    console.log(e);
-  }
-
-  const onBrowserClose = e => {
-    console.log(e);
-    // dataChannel.close(); // this is causing issues with streamSaver. Maybe when it has to open the iframe?
-  }
-
-  if (dataChannel.readyState === 'open') onOpen();
-  else dataChannel.addEventListener('open', onOpen);
-
-  dataChannel.addEventListener('message', onMessage);
-  dataChannel.addEventListener('close', onClose);
-  dataChannel.addEventListener('error', onError);
-  
-  /**
-   * Sometimes the web rtc connection doesn't close when quitting the tab so this
-   * makes sure that the connection closes.
-   */
-  window.addEventListener('beforeunload', onBrowserClose);
 }
 
 let setupDataChannelListeners = false;
 
 store.subscribe(() => {
   if (setupDataChannelListeners === true) return;
-  const { connection } = store.getState();
-  const { dataChannel } = connection;
-  if (dataChannel instanceof window.RTCDataChannel) {
+  const { webrtcConnection } = store.getState().connection;
+  if (webrtcConnection !== false) {
     setupDataChannelListeners = true;
-    addEventListeners(dataChannel);
+    addEventListeners(webrtcConnection);
   }
 });
 
@@ -120,7 +72,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
   }
 }
-
-window.store = store;
 
 export default store;

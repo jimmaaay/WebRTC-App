@@ -7,29 +7,19 @@ import {
 import './index.css';
 import App from './App';
 import store from './store';
-import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(
-  <Provider store={store}>
-    <Router>
-      <App />
-    </Router>
-  </Provider>,
-  document.getElementById('root')
-);
-
-
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    ReactDOM.render(
-      <Provider store={store}>
-        <Router>
-          <App />
-        </Router>
-      </Provider>,
-      document.getElementById('root')
-    );
-  });
+const render = () => {
+  ReactDOM.render(
+    <Provider store={store}>
+      <Router>
+        <App />
+      </Router>
+    </Provider>,
+    document.getElementById('root')
+  );
 }
 
-// registerServiceWorker();
+render();
+
+
+if (module.hot) module.hot.accept('./App', render);

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { typingMessage, sendMessage } from '../actions/chat';
+import { disconnected } from '../actions/connection';
 import ChatWindow from '../components/ChatWindow/ChatWindow';
 
 class Connected extends Component {
@@ -12,36 +13,41 @@ class Connected extends Component {
     this.changeMessage = this.changeMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
   }
-
-  // TODO: reenable the checks if peers are connected
   
 
-  // componentDidMount() {
-  //   const { history, dataChannel, fakeConnection } = this.props;
+  componentDidMount() {
+    const { history, webrtcConnection , fakeConnection } = this.props;
 
-  //   if (fakeConnection === true) return;
+    if (fakeConnection === true) return;
     
-  //   // Routes users back to the home page if a valid dataChannel is not present
-  //   if (! (dataChannel instanceof window.RTCDataChannel)) {
-  //     history.push('/');
-  //   }
+    // Routes users back to the home page if not connected
+    // TODO: add method in lib to check the connection status
+    if (webrtcConnection === false) {
+      history.push('/');
+    }
 
-  // }
+  }
 
-  // componentDidUpdate() {
-  //   const { history, dataChannel, fakeConnection } = this.props;
+  componentDidUpdate() {
+    const { history, webrtcConnection, fakeConnection } = this.props;
 
-  //   if (fakeConnection === true) return;
+    if (fakeConnection === true) return;
 
-  //   if (! (dataChannel instanceof window.RTCDataChannel)) {
-  //     /*
-  //      *  TODO: don't redirect user back to home. Display a message which says chat is disconnected
-  //      *  and don't let them type anything in the chat box
-  //      */
-  //     history.push('/');
-  //   }
+    // Routes users back to the home page if not connected
+    // TODO: add method in lib to check the connection status
+    if (webrtcConnection === false) {
+      /*
+       *  TODO: don't redirect user back to home. Display a message which says chat is disconnected
+       *  and don't let them type anything in the chat box
+       */
+      history.push('/');
+    }
 
-  // }
+  }
+
+  componentWillUnmount() {
+    this.props.disconnected();
+  }
 
   chatBox() {
     const { connectedTime, messages } = this.props;
@@ -110,10 +116,10 @@ class Connected extends Component {
 const mapStateToProps = (state) => {
   return {
     connectedTime: state.connection.connectedTime,
-    dataChannel: state.connection.dataChannel,
     messages: state.chat.messages,
     currentMessage: state.chat.currentMessage,
     fakeConnection: state.connection.fakeConnection,
+    webrtcConnection: state.connection.webrtcConnection,
   };
 }
 
@@ -121,6 +127,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     typingMessage: (_) => dispatch(typingMessage(_)),
     sendMessage: (_) => dispatch(sendMessage(_)),
+    disconnected: () => dispatch(disconnected()),
   };
 }
 

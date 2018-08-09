@@ -52,16 +52,24 @@ const addEventListeners = (connection) => {
 
     });
 
+    return () => {
+      connection.removeAllListeners();
+    }
+
 }
 
 let setupDataChannelListeners = false;
+let removeListeners = false;
 
 store.subscribe(() => {
-  if (setupDataChannelListeners === true) return;
   const { webrtcConnection } = store.getState().connection;
-  if (webrtcConnection !== false) {
+  if (webrtcConnection !== false && setupDataChannelListeners === false) {
     setupDataChannelListeners = true;
-    addEventListeners(webrtcConnection);
+    removeListeners = addEventListeners(webrtcConnection);
+  } else if (webrtcConnection === false && setupDataChannelListeners === true) {
+    removeListeners();
+    removeListeners = false;
+    setupDataChannelListeners = false;
   }
 });
 
